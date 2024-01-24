@@ -23,6 +23,7 @@ public class ErrorHandler {
         ResponseEntity email = ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         return email;
     }
+
     @ExceptionHandler
     public ResponseEntity handleAccessIsDenied(final AccessIsDeniedException e) {
         ResponseEntity access = ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());

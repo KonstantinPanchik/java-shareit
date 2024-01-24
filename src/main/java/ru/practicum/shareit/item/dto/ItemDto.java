@@ -30,12 +30,12 @@ public class ItemDto {
     Long request;
 
     public static ItemDto toItemDto(Item item) {
-        return ItemDto.builder().
-                name(item.getName()).
-                description(item.getDescription()).
-                available(item.isAvailable()).
-                request(item.getRequest()).
-                build();
+        return ItemDto.builder()
+                .name(item.getName())
+                .description(item.getDescription())
+                .available(item.isAvailable())
+                .request(item.getRequest())
+                .build();
     }
 
 

@@ -7,10 +7,10 @@ import java.util.List;
 
 public interface UserRepository {
 
-
     User addUser(User user);
 
     void deleteUser(Long userId);
+
     User getUser(Long userId);
 
     User updateUser(Long userId, UserDto userDto);
@@ -18,6 +18,5 @@ public interface UserRepository {
     List<User> getAllUsers();
 
     boolean isUserExist(long userId);
-
 
 }
