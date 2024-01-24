@@ -1,9 +1,10 @@
-package ru.practicum.shareit.user;
+package ru.practicum.shareit.user.repository;
 
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.exception.EmailAlreadyExistException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.model.User;
 
 import java.util.*;
 
@@ -82,5 +83,10 @@ public class UserRepositoryMem implements UserRepository {
         if (!isEmailAvailable(email)) {
             throw new EmailAlreadyExistException("Пользователь с Email " + email + "Уже существует");
         }
+    }
+
+    @Override
+    public boolean isUserExist(long userId) {
+        return users.containsKey(userId);
     }
 }
