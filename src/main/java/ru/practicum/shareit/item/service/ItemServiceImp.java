@@ -48,7 +48,7 @@ public class ItemServiceImp implements ItemService {
     @Override
     public List<Item> getUserItems(Long userId) {
         if (!(userRepository.isUserExist(userId))) {
-            log.error("User {} notFound", userId);
+            log.warn("User {} notFound", userId);
             throw new NotFoundException("Пользователь с id " + userId + " не существует");
         }
         return itemRepository.getUserItems(userId);
