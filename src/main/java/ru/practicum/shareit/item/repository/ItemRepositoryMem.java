@@ -48,7 +48,7 @@ public class ItemRepositoryMem implements ItemRepository {
         Item item = Optional.ofNullable(items.get(itemId))
                 .orElseThrow(() -> new NotFoundException("Предмет с id " + itemId + " не найден"));
 
-        if (item.getUser() != userId) {
+        if (!(item.getUser().equals(userId))) {
             log.warn("Wrong user id {} and item owner id {}", userId, item.getUser());
             throw new AccessIsDeniedException("Вы не можете редактировать, чужие предметы!");
         }
@@ -65,7 +65,7 @@ public class ItemRepositoryMem implements ItemRepository {
 
     @Override
     public List<Item> getUserItems(Long userId) {
-        return items.values().stream().filter(item -> item.getUser() == userId).collect(Collectors.toList());
+        return items.values().stream().filter(item -> item.getUser().equals(userId)).collect(Collectors.toList());
     }
 
     @Override
