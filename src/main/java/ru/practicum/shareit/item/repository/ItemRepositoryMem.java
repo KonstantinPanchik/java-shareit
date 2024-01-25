@@ -58,13 +58,16 @@ public class ItemRepositoryMem implements ItemRepository {
 
     @Override
     public Item getById(Long itemId) {
-        return Optional.ofNullable(items.get(itemId))
+        Item result = Optional.ofNullable(items.get(itemId))
                 .orElseThrow(() -> new NotFoundException("Предмет с id " + itemId + " не найден"));
+        log.info("Item {} found successfully", itemId);
+        return result;
 
     }
 
     @Override
     public List<Item> getUserItems(Long userId) {
+        log.info("Item of user {} found successfully", userId);
         return items.values().stream().filter(item -> item.getUser().equals(userId)).collect(Collectors.toList());
     }
 
