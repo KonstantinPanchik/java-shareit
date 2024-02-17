@@ -58,7 +58,7 @@ public class BookingServiceImp implements BookingService {
     public BookingResponseDto setAppove(Long userId, Long bookingId, Boolean approved) {
         Optional<Booking> booking1 = bookingRepository.findById(bookingId);
         Booking booking = booking1.orElseThrow(() -> new NotFoundException("Booking has been not found "));
-        boolean isOwner = booking.getItem().getUser().getId() == userId;
+        boolean isOwner = booking.getItem().getUser().getId().equals(userId);
         if (!isOwner) {
             throw new AccessIsDeniedException("Not your item");
         }

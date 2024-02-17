@@ -50,7 +50,7 @@ public class ItemServiceImp implements ItemService {
     @Override
     public ItemResponseDto updateItem(ItemCreationDto itemCreationDto, Long userId, Long itemId) {
         Item item = itemRepository.findById(itemId).orElseThrow(() -> new NotFoundException("Item"));
-        if (item.getUser().getId() != userId) {
+        if (!(item.getUser().getId().equals(userId))) {
             throw new AccessIsDeniedException("You can't update this item");
         }
         item = ItemMapper.updateNotNullFromDto(itemCreationDto, item);
