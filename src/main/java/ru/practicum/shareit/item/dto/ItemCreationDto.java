@@ -3,19 +3,17 @@ package ru.practicum.shareit.item.dto;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.validation.annotation.Validated;
-import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.ItemRequest;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-/**
- * TODO Sprint add-controllers.
- */
+
 @Data
 @Builder
 @Validated
-public class ItemDto {
+public class ItemCreationDto {
     @NotNull
     @NotBlank
     @Size(min = 3, max = 200)
@@ -27,16 +25,5 @@ public class ItemDto {
     @NotNull
     Boolean available;
 
-    Long request;
-
-    public static ItemDto toItemDto(Item item) {
-        return ItemDto.builder()
-                .name(item.getName())
-                .description(item.getDescription())
-                .available(item.isAvailable())
-                .request(item.getRequest())
-                .build();
-    }
-
-
+    ItemRequest request;
 }
