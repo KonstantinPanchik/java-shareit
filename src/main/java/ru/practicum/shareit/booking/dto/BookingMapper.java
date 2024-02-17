@@ -28,8 +28,8 @@ public class BookingMapper {
     }
 
     public static BookingResponseDto toBookingResponse(Booking booking) {
-        BookingResponseDto dto = BookingResponseDto.builder().
-                id(booking.getId())
+        BookingResponseDto dto = BookingResponseDto.builder()
+                .id(booking.getId())
                 .start(booking.getStart())
                 .end(booking.getEnd())
                 .status(booking.getStatus())

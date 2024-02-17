@@ -102,8 +102,8 @@ public class ItemServiceImp implements ItemService {
 
                     return ItemMapper.toResponseDto(item, lastDto, nextDto);
 
-                }).
-                collect(Collectors.toList());
+                })
+                .collect(Collectors.toList());
     }
 
     @Override

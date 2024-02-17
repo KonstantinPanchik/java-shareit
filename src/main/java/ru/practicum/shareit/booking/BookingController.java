@@ -43,8 +43,8 @@ public class BookingController {
     @GetMapping
     public ResponseEntity getAllMyBooking(@RequestHeader("X-Sharer-User-Id") @NotNull Long userId,
                                           @RequestParam(required = false, defaultValue = "ALL") String state) {
-        StateOfBookings stateOfBookings = StateOfBookings.from(state).
-                orElseThrow(() -> new UnknownStateException("Unknown state: " + state));
+        StateOfBookings stateOfBookings = StateOfBookings.from(state)
+                .orElseThrow(() -> new UnknownStateException("Unknown state: " + state));
 
         return ResponseEntity.ok(bookingService.getBookingOfBooker(userId, stateOfBookings));
     }
@@ -53,7 +53,7 @@ public class BookingController {
     public ResponseEntity getBookingOfMyItems(@RequestHeader("X-Sharer-User-Id") @NotNull Long userId,
                                               @RequestParam(required = false, defaultValue = "ALL") String state) {
         StateOfBookings stateOfBookings = StateOfBookings.from(state)
-                        .orElseThrow(() -> new UnknownStateException("Unknown state: " + state));
+                .orElseThrow(() -> new UnknownStateException("Unknown state: " + state));
 
         return ResponseEntity.ok(bookingService.getBookingOfOwner(userId, stateOfBookings));
     }
