@@ -108,10 +108,9 @@ public class BookingServiceImp implements BookingService {
 
 
         }
-        return result.
-                stream().
-                map(BookingMapper::toBookingResponse).
-                collect(Collectors.toList());
+        return result.stream()
+                .map(BookingMapper::toBookingResponse)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -141,10 +140,9 @@ public class BookingServiceImp implements BookingService {
                 throw new RuntimeException("нет варианта для " + state);
 
         }
-        return result.
-                stream().
-                map(BookingMapper::toBookingResponse).
-                collect(Collectors.toList());
+        return result.stream()
+                .map(BookingMapper::toBookingResponse)
+                .collect(Collectors.toList());
     }
 
 

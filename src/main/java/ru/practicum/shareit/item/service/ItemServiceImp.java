@@ -56,12 +56,12 @@ public class ItemServiceImp implements ItemService {
         item = ItemMapper.updateNotNullFromDto(itemCreationDto, item);
         itemRepository.save(item);
 
-        Booking last = bookingRepository.
-                findLastByItem(itemId, LocalDateTime.now(), Status.APPROVED).stream().findFirst().orElse(null);
+        Booking last = bookingRepository
+                .findLastByItem(itemId, LocalDateTime.now(), Status.APPROVED).stream().findFirst().orElse(null);
         ItemResponseDto.BookingDto lastDto = BookingMapper.toItemBookingDto(last);
 
-        Booking next = bookingRepository.
-                findNextByItem(itemId, LocalDateTime.now(), Status.APPROVED).stream().findFirst().orElse(null);
+        Booking next = bookingRepository
+                .findNextByItem(itemId, LocalDateTime.now(), Status.APPROVED).stream().findFirst().orElse(null);
         ItemResponseDto.BookingDto nextDto = BookingMapper.toItemBookingDto(next);
 
 
@@ -75,11 +75,11 @@ public class ItemServiceImp implements ItemService {
         Booking last = null;
         Booking next = null;
         if (item.getUser().getId().equals(userId)) {
-            last = bookingRepository.
-                    findLastByItem(itemId, LocalDateTime.now(), Status.APPROVED).stream().findFirst().orElse(null);
+            last = bookingRepository
+                    .findLastByItem(itemId, LocalDateTime.now(), Status.APPROVED).stream().findFirst().orElse(null);
 
-            next = bookingRepository.
-                    findNextByItem(itemId, LocalDateTime.now(), Status.APPROVED).stream().findFirst().orElse(null);
+            next = bookingRepository
+                    .findNextByItem(itemId, LocalDateTime.now(), Status.APPROVED).stream().findFirst().orElse(null);
         }
 
         return ItemMapper.toResponseDto(item,
@@ -89,14 +89,14 @@ public class ItemServiceImp implements ItemService {
 
     @Override
     public List<ItemResponseDto> getUserItems(Long userId) {
-        return itemRepository.userItems(userId).stream().
-                map(item -> {
-                    Booking last = bookingRepository.
-                            findLastByItem(item.getId(), LocalDateTime.now(), Status.APPROVED).stream().findFirst().orElse(null);
+        return itemRepository.userItems(userId).stream()
+                .map(item -> {
+                    Booking last = bookingRepository
+                            .findLastByItem(item.getId(), LocalDateTime.now(), Status.APPROVED).stream().findFirst().orElse(null);
                     ItemResponseDto.BookingDto lastDto = BookingMapper.toItemBookingDto(last);
 
-                    Booking next = bookingRepository.
-                            findNextByItem(item.getId(), LocalDateTime.now(), Status.APPROVED).stream().findFirst().orElse(null);
+                    Booking next = bookingRepository
+                            .findNextByItem(item.getId(), LocalDateTime.now(), Status.APPROVED).stream().findFirst().orElse(null);
                     ItemResponseDto.BookingDto nextDto = BookingMapper.toItemBookingDto(next);
 
 
@@ -111,9 +111,7 @@ public class ItemServiceImp implements ItemService {
         if (text == null || text.isBlank()) {
             return new ArrayList<>();
         }
-        return itemRepository.search(text).stream().
-                map(ItemMapper::toResponseDto).
-                collect(Collectors.toList());
+        return itemRepository.search(text).stream().map(ItemMapper::toResponseDto).collect(Collectors.toList());
     }
 
     @Override

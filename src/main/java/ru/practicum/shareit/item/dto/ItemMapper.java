@@ -14,34 +14,35 @@ public class ItemMapper {
 
     public static ItemResponseDto toResponseDto(Item item) {
 
-        List<ItemResponseDto.CommentDto> commentDtos = item.getComments().//fffff
-                stream().
-                map(ItemMapper::toCommentDto).
-                collect(Collectors.toList());
+        List<ItemResponseDto.CommentDto> commentDtos = item.getComments()
+                .stream()
+                .map(ItemMapper::toCommentDto)
+                .collect(Collectors.toList());
 
-        return ItemResponseDto.builder().id(item.getId()).
-                name(item.getName()).
-                comments(commentDtos).
-                description(item.getDescription()).
-                available(item.getAvailable()).build();
+        return ItemResponseDto.builder()
+                .id(item.getId())
+                .name(item.getName())
+                .comments(commentDtos)
+                .description(item.getDescription())
+                .available(item.getAvailable()).build();
     }
 
     public static ItemResponseDto toResponseDto(Item item,
                                                 ItemResponseDto.BookingDto last,
                                                 ItemResponseDto.BookingDto next) {
-        List<ItemResponseDto.CommentDto> commentDtos = item.getComments().//fffff
-                stream().
-                map(ItemMapper::toCommentDto).
-                collect(Collectors.toList());
+        List<ItemResponseDto.CommentDto> commentDtos = item.getComments()
+                .stream()
+                .map(ItemMapper::toCommentDto)
+                .collect(Collectors.toList());
 
-        return ItemResponseDto.builder().id(item.getId()).
-                name(item.getName()).
-                description(item.getDescription()).
-                available(item.getAvailable()).
-                lastBooking(last).
-                nextBooking(next).
-                comments(commentDtos).
-                build();
+        return ItemResponseDto.builder().id(item.getId())
+                .name(item.getName())
+                .description(item.getDescription())
+                .available(item.getAvailable())
+                .lastBooking(last)
+                .nextBooking(next)
+                .comments(commentDtos)
+                .build();
     }
 
     public static Item updateNotNullFromDto(@NotNull ItemCreationDto itemCreationDto, @NotNull Item item) {
@@ -62,11 +63,11 @@ public class ItemMapper {
     }
 
     public static ItemResponseDto.CommentDto toCommentDto(Comment comment) {
-        ItemResponseDto.CommentDto dto = ItemResponseDto.CommentDto.builder().
-                text(comment.getText()).
-                authorName(comment.getAuthor().getName()).
-                id(comment.getId()).created(comment.getCreated()).
-                build();
+        ItemResponseDto.CommentDto dto = ItemResponseDto.CommentDto.builder()
+                .text(comment.getText())
+                .authorName(comment.getAuthor().getName())
+                .id(comment.getId()).created(comment.getCreated())
+                .build();
         return dto;
     }
 
