@@ -100,8 +100,7 @@ public class BookingServiceImp implements BookingService {
             case CURRENT:
                 result = bookingRepository.getCurrentBookingOfBooker(bookerId, LocalDateTime.now());
                 break;
-            case WAITING:
-            case REJECTED:
+            default:
 
                 result = bookingRepository.getRejectedOrWaitingBookingOfBooker(bookerId, Status.valueOf(state.toString()));
                 break;
@@ -131,13 +130,10 @@ public class BookingServiceImp implements BookingService {
             case CURRENT:
                 result = bookingRepository.getCurrentBookingOfOwner(bookerId, LocalDateTime.now());
                 break;
-            case WAITING:
-            case REJECTED:
+            default:
                 result = bookingRepository.getRejectedOrWaitingBookingOfOwner(bookerId, Status.valueOf(state.toString()));
                 break;
 
-            default:
-                throw new RuntimeException("нет варианта для " + state);
 
         }
         return result.stream()
