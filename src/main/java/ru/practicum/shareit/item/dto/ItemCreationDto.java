@@ -3,7 +3,7 @@ package ru.practicum.shareit.item.dto;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.validation.annotation.Validated;
-import ru.practicum.shareit.request.ItemRequest;
+import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.validationGroup.AdvanceInfo;
 import ru.practicum.shareit.validationGroup.BasicInfo;
 
