@@ -31,14 +31,16 @@ public class ItemRequestController {
     }
 
     @GetMapping("/{requestId}")
-    public ResponseEntity getRequest(@PathVariable Long requestId) {
-        return ResponseEntity.ok(itemRequestService.getRequest(requestId));
+    public ResponseEntity getRequest(@PathVariable Long requestId,
+                                     @RequestHeader("X-Sharer-User-Id") @NotNull Long userId) {
+        return ResponseEntity.ok(itemRequestService.getRequest(requestId, userId));
     }
 
-    @GetMapping("/all}")
-    public ResponseEntity getAllRequests(@RequestParam(required = false, defaultValue = "0") @Min(0L) Long from,
-                                         @RequestParam(required = false, defaultValue = "20") @Positive Long size) {
-        return ResponseEntity.ok(itemRequestService.getAllRequests(from, size));
+    @GetMapping("/all")
+    public ResponseEntity getAllRequests(@RequestParam(required = false, defaultValue = "0") @Min(0L) Integer from,
+                                         @RequestParam(required = false, defaultValue = "20") @Positive Integer size,
+                                         @RequestHeader("X-Sharer-User-Id") @NotNull Long userId) {
+        return ResponseEntity.ok(itemRequestService.getAllRequests(from, size, userId));
     }
 
 }
