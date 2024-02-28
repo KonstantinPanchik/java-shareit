@@ -1,31 +1,45 @@
 package ru.practicum.shareit.item.model;
 
-import lombok.Builder;
 import lombok.Data;
-import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.request.ItemRequest;
+import ru.practicum.shareit.user.model.User;
 
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.List;
 
-/**
- * TODO Sprint add-controllers.
- */
+
 @Data
-@Builder
+@Entity
+@Table(name = "items")
 public class Item {
-    long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Long id;
     @Size(min = 3, max = 200)
     String name;
     @Size(max = 500)
     String description;
+    @NotNull
+    Boolean available;
 
-    boolean available;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    User user;
+    @ManyToOne
+    @JoinColumn(name = "request_id")
+    ItemRequest request;
 
-    Long user;
+    @OneToMany(fetch = FetchType.EAGER)
+    @JoinColumn(name = "item_id")
+    List<Comment> comments;
 
-    Long request;
 
-    public Item(long id, String name, String description, boolean available, Long user, Long request) {
+    public Item() {
+    }
+
+    public Item(long id, String name, String description, boolean available, User user, ItemRequest request) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -34,21 +48,5 @@ public class Item {
         this.request = request;
     }
 
-    public Item updateNotNullFromDto(@NotNull ItemDto itemDto) {
-
-        String newName = itemDto.getName();
-        if (newName != null && !(newName.isBlank())) {
-            this.setName(newName);
-        }
-        String newDescription = itemDto.getDescription();
-        if (newDescription != null && !(newDescription.isBlank())) {
-            this.setDescription(newDescription);
-        }
-        Boolean newAvailable = itemDto.getAvailable();
-        if (newAvailable != null) {
-            this.setAvailable(newAvailable);
-        }
-        return this;
-    }
 
 }
