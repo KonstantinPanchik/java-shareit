@@ -31,4 +31,15 @@ public class ItemRequest {
     List<Item> items;
 
     LocalDateTime created;
+
+    public ItemRequest() {
+    }
+
+    public ItemRequest(Long id, String description, User requestor, List<Item> items, LocalDateTime created) {
+        this.id = id;
+        this.description = description;
+        this.requestor = requestor;
+        this.items = items;
+        this.created = created;
+    }
 }

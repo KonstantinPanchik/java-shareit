@@ -18,7 +18,7 @@ public class ItemRequestDto {
 
     LocalDateTime created;
 
-    List<ItemDto> answers;
+    List<ItemDto> items;
 
     @Data
     @Builder
