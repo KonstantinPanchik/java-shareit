@@ -15,6 +15,7 @@ import java.util.List;
 @Entity
 @Table(name = "requests")
 @Builder
+@NamedEntityGraph(name = "ItemRequest.items", attributeNodes = {@NamedAttributeNode("items")})
 public class ItemRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
