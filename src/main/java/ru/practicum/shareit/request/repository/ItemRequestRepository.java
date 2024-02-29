@@ -20,6 +20,9 @@ public interface ItemRequestRepository extends JpaRepository<ItemRequest, Long> 
     @EntityGraph("ItemRequest.items")
     Page<ItemRequest> findAll(Pageable pageable);
 
+
+
+
     @EntityGraph("ItemRequest.items")
     List<ItemRequest> findItemRequestByRequestorOrderByCreatedDesc(User requestor);
 }
