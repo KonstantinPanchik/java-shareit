@@ -115,7 +115,7 @@ public class ItemRequestServiceTest {
         when(userService.getUser(anyLong()))
                 .thenReturn(getRequestor());
 
-        when(itemRequestRepository.findAll(pageable))
+        when(itemRequestRepository.findItemRequestByRequestorNotOrderByCreatedDesc(getRequestor(), pageable))
                 .thenReturn(new PageImpl(getRequests()));
 
         List<ItemRequestDto> result = itemRequestService.getRequestsNotCurrentUser(0, 3, 1L);
