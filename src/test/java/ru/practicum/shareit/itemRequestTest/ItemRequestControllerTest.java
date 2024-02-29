@@ -55,7 +55,7 @@ public class ItemRequestControllerTest {
                 .andExpect(jsonPath("$.id", is(itemRequestDto.getId()), Long.class))
                 .andExpect(jsonPath("$.description", is(itemRequestDto.getDescription())))
                 .andExpect(jsonPath("$.created", is(itemRequestDto.getCreated().toString())))
-                .andExpect(jsonPath("$.answers", is(itemRequestDto.getAnswers())));
+                .andExpect(jsonPath("$.items", is(itemRequestDto.getItems())));
     }
 
     @Test
@@ -65,6 +65,7 @@ public class ItemRequestControllerTest {
 
 
         mockMvc.perform(get("/requests/1")
+
                         .header("X-Sharer-User-Id", 1L)
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -73,7 +74,7 @@ public class ItemRequestControllerTest {
                 .andExpect(jsonPath("$.id", is(itemRequestDto.getId()), Long.class))
                 .andExpect(jsonPath("$.description", is(itemRequestDto.getDescription())))
                 .andExpect(jsonPath("$.created", is(itemRequestDto.getCreated().toString())))
-                .andExpect(jsonPath("$.answers", is(itemRequestDto.getAnswers())));
+                .andExpect(jsonPath("$.items", is(itemRequestDto.getItems())));
     }
 
     @Test
@@ -95,9 +96,9 @@ public class ItemRequestControllerTest {
     }
 
     @Test
-    public void getResponses() throws Exception {
+    public void getAllRequests() throws Exception {
 
-        when(itemRequestServiceService.getAllRequests(anyInt(), anyInt(),anyLong()))
+        when(itemRequestServiceService.getRequestsNotCurrentUser(anyInt(), anyInt(), anyLong()))
                 .thenReturn(getRequests());
 
 
@@ -116,7 +117,7 @@ public class ItemRequestControllerTest {
             .description("Нужна газонокосилка")
             .id(1L)
             .created(LocalDateTime.of(2001, 9, 11, 10, 55, 48))
-            .answers(new ArrayList<>())
+            .items(new ArrayList<>())
             .build();
 
     private List<ItemRequestDto> getRequests() {
@@ -125,21 +126,21 @@ public class ItemRequestControllerTest {
                 .description("Нужна газонокосилка")
                 .id(1L)
                 .created(LocalDateTime.of(2001, 9, 11, 10, 55, 48))
-                .answers(new ArrayList<>())
+                .items(new ArrayList<>())
                 .build();
 
         ItemRequestDto itemRequestDto2 = ItemRequestDto.builder()
                 .description("Нужно остановить конец света и рулетка")
                 .id(2L)
                 .created(LocalDateTime.of(2012, 12, 12, 12, 12, 12))
-                .answers(new ArrayList<>())
+                .items(new ArrayList<>())
                 .build();
 
         ItemRequestDto itemRequestDto3 = ItemRequestDto.builder()
                 .description("Нужна собачья упряжка ")
                 .id(3L)
                 .created(LocalDateTime.of(2008, 7, 1, 23, 47, 45))
-                .answers(new ArrayList<>())
+                .items(new ArrayList<>())
                 .build();
 
         return List.of(itemRequestDto, itemRequestDto2, itemRequestDto3);

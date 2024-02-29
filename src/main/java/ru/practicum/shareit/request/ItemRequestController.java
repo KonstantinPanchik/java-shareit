@@ -38,7 +38,6 @@ public class ItemRequestController {
     }
 
     @GetMapping("/all")
-    //todo валидация значений и получение запросов созданных другими пользователями
     public ResponseEntity getAllRequests(@RequestParam(required = false, defaultValue = "0") @Min(0L) Integer from,
                                          @RequestParam(required = false, defaultValue = "20") @Min(1L) Integer size,
                                          @RequestHeader("X-Sharer-User-Id") @NotNull Long userId) {

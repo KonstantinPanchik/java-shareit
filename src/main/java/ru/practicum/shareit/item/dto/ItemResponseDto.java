@@ -15,7 +15,7 @@ public class ItemResponseDto {
     private Boolean available;
     private BookingDto lastBooking;
     private BookingDto nextBooking;
-
+    private Long requestId;
     List<CommentDto> comments;
 
     @Data

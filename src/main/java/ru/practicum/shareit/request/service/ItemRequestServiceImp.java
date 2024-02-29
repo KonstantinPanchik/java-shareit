@@ -57,13 +57,13 @@ public class ItemRequestServiceImp implements ItemRequestService {
     }
 
     @Override
-    public List<ItemRequestDto> getAllRequests(Integer from, Integer size, Long userId) {
+    public List<ItemRequestDto> getRequestsNotCurrentUser(Integer from, Integer size, Long userId) {
 
-        userService.getUser(userId);
+        User requestor = userService.getUser(userId);
 
         Pageable pageable = PageRequest.of(from / size, size, Sort.by("created").descending());
 
-        List<ItemRequest> result = itemRequestRepository.findAll(pageable).getContent();
+        List<ItemRequest> result = itemRequestRepository.findItemRequestByRequestorNotOrderByCreatedDesc(requestor, pageable).getContent();
 
         return result.stream().map(ItemRequestMapper::toItemRequestDto).collect(Collectors.toList());
     }

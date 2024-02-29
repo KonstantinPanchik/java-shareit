@@ -56,8 +56,7 @@ public class ItemRequestServiceTest {
 
         ItemRequestDto result = itemRequestService.addRequest(itemRequest, 2L);
         assertEquals(result.getDescription(), itemRequest.getDescription());
-        assertTrue(result.getAnswers().isEmpty());
-        assertEquals(result.getCreated(), LocalDateTime.now());
+        assertTrue(result.getItems().isEmpty());
     }
 
     @Test
@@ -72,7 +71,7 @@ public class ItemRequestServiceTest {
 
         ItemRequestDto result = itemRequestService.getRequest(1L, 2L);
         assertEquals(result.getDescription(), getRequests().get(0).getDescription());
-        assertEquals(result.getAnswers().size(), getRequests().get(0).getItems().size());
+        assertEquals(result.getItems().size(), getRequests().get(0).getItems().size());
         assertEquals(result.getCreated(), getRequests().get(0).getCreated());
     }
 
@@ -88,7 +87,7 @@ public class ItemRequestServiceTest {
 
         ItemRequestDto result = itemRequestService.getRequest(1L, 2L);
         assertEquals(result.getDescription(), getRequests().get(0).getDescription());
-        assertEquals(result.getAnswers().size(), getRequests().get(0).getItems().size());
+        assertEquals(result.getItems().size(), getRequests().get(0).getItems().size());
         assertEquals(result.getCreated(), getRequests().get(0).getCreated());
     }
 
@@ -119,7 +118,7 @@ public class ItemRequestServiceTest {
         when(itemRequestRepository.findAll(pageable))
                 .thenReturn(new PageImpl(getRequests()));
 
-        List<ItemRequestDto> result = itemRequestService.getAllRequests(0, 3, 1L);
+        List<ItemRequestDto> result = itemRequestService.getRequestsNotCurrentUser(0, 3, 1L);
 
         assertEquals(result.size(), 3);
         assertEquals(getRequests().get(0).getDescription(), result.get(0).getDescription());
@@ -152,9 +151,18 @@ public class ItemRequestServiceTest {
                 .items(getItems(10, 3))
                 .build();
 
+        setRequest(one.getItems(), one);
+        setRequest(two.getItems(), two);
+        setRequest(three.getItems(), three);
 
         return List.of(one, two, three);
 
+    }
+
+    private void setRequest(List<Item> items, ItemRequest itemRequest) {
+        for (Item item : items) {
+            item.setRequest(itemRequest);
+        }
     }
 
     private List<Item> getItems(int idStart, int length) {

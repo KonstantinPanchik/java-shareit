@@ -27,5 +27,5 @@ public class ItemCreationDto {
     @NotNull(groups = BasicInfo.class)
     Boolean available;
 
-    ItemRequest request;
+    Long requestId;
 }
