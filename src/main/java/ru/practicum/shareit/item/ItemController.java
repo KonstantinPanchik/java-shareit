@@ -12,6 +12,7 @@ import ru.practicum.shareit.validationGroup.AdvanceInfo;
 import ru.practicum.shareit.validationGroup.BasicInfo;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
@@ -19,6 +20,7 @@ import java.util.List;
 @RequestMapping("/items")
 @RequiredArgsConstructor
 @Slf4j
+@Validated
 public class ItemController {
 
     private final ItemService service;
@@ -45,15 +47,19 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemResponseDto> getAllItem(@RequestHeader("X-Sharer-User-Id") @NotNull Long userId) {
+    public List<ItemResponseDto> getAllItem(@RequestHeader("X-Sharer-User-Id") @NotNull Long userId,
+                                            @RequestParam(required = false, defaultValue = "0") @Min(0) Integer from,
+                                            @RequestParam(required = false, defaultValue = "20") @Min(1) Integer size) {
         log.info("GET all items of user with id {}", userId);
-        return service.getUserItems(userId);
+        return service.getUserItems(userId, from, size);
     }
 
     @GetMapping("/search")
-    public List<ItemResponseDto> search(@RequestParam String text) {
+    public List<ItemResponseDto> search(@RequestParam String text,
+                                        @RequestParam(required = false, defaultValue = "0") @Min(0) Integer from,
+                                        @RequestParam(required = false, defaultValue = "20") @Min(1) Integer size) {
         log.info("GET search {}", text);
-        return service.search(text.toLowerCase());
+        return service.search(text.toLowerCase(), from, size);
     }
 
     @PostMapping("/{itemId}/comment")

@@ -2,6 +2,8 @@ package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.Status;
@@ -96,8 +98,10 @@ public class ItemServiceImp implements ItemService {
     }
 
     @Override
-    public List<ItemResponseDto> getUserItems(Long userId) {
-        return itemRepository.userItems(userId).stream()
+    public List<ItemResponseDto> getUserItems(Long userId, Integer from, Integer size) {
+
+        return itemRepository.userItems(userId, PageRequest.of(from / size, size, Sort.by("id")))
+                .stream()
                 .map(item -> {
                     Booking last = bookingRepository
                             .findLastByItem(item.getId(), LocalDateTime.now(), Status.APPROVED).stream().findFirst().orElse(null);
@@ -115,11 +119,14 @@ public class ItemServiceImp implements ItemService {
     }
 
     @Override
-    public List<ItemResponseDto> search(String text) {
+    public List<ItemResponseDto> search(String text, Integer from, Integer size) {
         if (text == null || text.isBlank()) {
             return new ArrayList<>();
         }
-        return itemRepository.search(text).stream().map(ItemMapper::toResponseDto).collect(Collectors.toList());
+        return itemRepository.search(text, PageRequest.of(from / size, size, Sort.by("id")))
+                .stream()
+                .map(ItemMapper::toResponseDto)
+                .collect(Collectors.toList());
     }
 
     @Override

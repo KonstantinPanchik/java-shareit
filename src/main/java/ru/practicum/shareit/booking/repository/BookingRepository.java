@@ -26,12 +26,12 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     @Query("select b from Booking as b join fetch b.booker as u " +
             "join fetch b.item as i " +
-            "WHERE i.id=?1 AND b.start>?2 AND b.status=?3  ")
+            "WHERE i.id=?1 AND b.start>?2 AND b.status=?3 ORDER BY b.start ")
     List<Booking> findNextByItem(Long aLong, LocalDateTime now, Status status);
 
     @Query("select b from Booking as b join fetch b.booker as u " +
             "join fetch b.item as i " +
-            "WHERE i.id=?1 AND b.start<?2 AND b.status=?3  ")
+            "WHERE i.id=?1 AND b.start<?2 AND b.status=?3 ORDER BY b.start DESC ")
     List<Booking> findLastByItem(Long aLong, LocalDateTime now, Status status);
 
 //ORDER BY b.start DESC

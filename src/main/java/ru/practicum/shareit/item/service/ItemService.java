@@ -14,9 +14,9 @@ public interface ItemService {
 
     ItemResponseDto getItem(Long itemId, Long userId);
 
-    List<ItemResponseDto> getUserItems(Long userId);
+    List<ItemResponseDto> getUserItems(Long userId, Integer from, Integer size);
 
-    List<ItemResponseDto> search(String search);
+    List<ItemResponseDto> search(String search, Integer from, Integer size);
 
     ItemResponseDto.CommentDto addComment(Comment comment, Long userId, Long itemId);
 }
