@@ -24,5 +24,12 @@ public class User {
     @Size(max = 512)
     private String email;
 
+    public User(Long id, String name, String email) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+    }
 
+    public User() {
+    }
 }
