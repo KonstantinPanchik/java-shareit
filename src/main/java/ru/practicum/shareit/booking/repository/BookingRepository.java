@@ -1,6 +1,5 @@
 package ru.practicum.shareit.booking.repository;
 
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -34,7 +33,6 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "WHERE i.id=?1 AND b.start<?2 AND b.status=?3 ORDER BY b.start DESC ")
     List<Booking> findLastByItem(Long aLong, LocalDateTime now, Status status);
 
-//ORDER BY b.start DESC
     //методы получения бронирований от букера
     @Query("select b from Booking as b join fetch b.booker as u " +
             " WHERE u.id=?1 ")

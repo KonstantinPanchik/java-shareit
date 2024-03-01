@@ -50,7 +50,7 @@ public class BookingController {
                                           @RequestParam(required = false, defaultValue = "20") @Min(1) Integer size) {
         StateOfBookings stateOfBookings = StateOfBookings.from(state)
                 .orElseThrow(() -> new UnknownStateException("Unknown state: " + state));
-        //todo пагинация
+
         return ResponseEntity.ok(bookingService.getAllBookingOfBooker(userId, stateOfBookings, from, size));
     }
 
@@ -61,10 +61,8 @@ public class BookingController {
                                               @RequestParam(required = false, defaultValue = "20") @Min(1) Integer size) {
         StateOfBookings stateOfBookings = StateOfBookings.from(state)
                 .orElseThrow(() -> new UnknownStateException("Unknown state: " + state));
-        //todo пагинация
 
         return ResponseEntity.ok(bookingService.getBookingOfOwner(userId, stateOfBookings, from, size));
     }
-
 
 }
