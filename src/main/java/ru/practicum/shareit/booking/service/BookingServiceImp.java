@@ -22,7 +22,6 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -106,17 +105,17 @@ public class BookingServiceImp implements BookingService {
                 break;
             case FUTURE:
                 result = bookingRepository.getFutureBookingOfBooker(bookerId, LocalDateTime.now(), pageable)
-                        ;
+                ;
                 break;
             case CURRENT:
                 result = bookingRepository.getCurrentBookingOfBooker(bookerId, LocalDateTime.now(), pageable)
-                        ;
+                ;
                 break;
             default:
 
                 result = bookingRepository
                         .getRejectedOrWaitingBookingOfBooker(bookerId, Status.valueOf(state.toString()), pageable)
-                        ;
+                ;
                 break;
 
 
