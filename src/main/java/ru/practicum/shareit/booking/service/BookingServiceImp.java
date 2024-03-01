@@ -2,6 +2,9 @@ package ru.practicum.shareit.booking.service;
 
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.StateOfBookings;
@@ -83,26 +86,37 @@ public class BookingServiceImp implements BookingService {
     }
 
     @Override
-    public List<BookingResponseDto> getBookingOfBooker(Long bookerId, StateOfBookings state) {
+    public List<BookingResponseDto> getAllBookingOfBooker(Long bookerId,
+                                                          StateOfBookings state,
+                                                          Integer from,
+                                                          Integer size) {
         User booker = userRepository.findById(bookerId).orElseThrow(() -> new NotFoundException("User not found"));
-        List<Booking> result = new ArrayList<>();
+        Pageable pageable = PageRequest.of(from / size, size, Sort.by("start").descending());
+        List<Booking> result;
         switch (state) {
 
             case ALL:
-                result = bookingRepository.getAllBookingOfBooker(bookerId);
+                result = bookingRepository.getAllBookingOfBooker(bookerId, pageable)//.getContent()
+                ;
                 break;
             case PAST:
-                result = bookingRepository.getPastBookingOfBooker(bookerId, LocalDateTime.now());
+                result = bookingRepository.getPastBookingOfBooker(bookerId, LocalDateTime.now(), pageable)
+                // .getContent()
+                ;
                 break;
             case FUTURE:
-                result = bookingRepository.getFutureBookingOfBooker(bookerId, LocalDateTime.now());
+                result = bookingRepository.getFutureBookingOfBooker(bookerId, LocalDateTime.now(), pageable)
+                        ;
                 break;
             case CURRENT:
-                result = bookingRepository.getCurrentBookingOfBooker(bookerId, LocalDateTime.now());
+                result = bookingRepository.getCurrentBookingOfBooker(bookerId, LocalDateTime.now(), pageable)
+                        ;
                 break;
             default:
 
-                result = bookingRepository.getRejectedOrWaitingBookingOfBooker(bookerId, Status.valueOf(state.toString()));
+                result = bookingRepository
+                        .getRejectedOrWaitingBookingOfBooker(bookerId, Status.valueOf(state.toString()), pageable)
+                        ;
                 break;
 
 
@@ -113,25 +127,31 @@ public class BookingServiceImp implements BookingService {
     }
 
     @Override
-    public List<BookingResponseDto> getBookingOfOwner(Long bookerId, StateOfBookings state) {
+    public List<BookingResponseDto> getBookingOfOwner(Long bookerId,
+                                                      StateOfBookings state,
+                                                      Integer from,
+                                                      Integer size) {
         User booker = userRepository.findById(bookerId).orElseThrow(() -> new NotFoundException("User not found"));
+        Pageable pageable = PageRequest.of(from / size, size, Sort.by("start").descending());
         List<Booking> result;
         switch (state) {
 
             case ALL:
-                result = bookingRepository.getAllBookingOfOwner(bookerId);
+                result = bookingRepository.getAllBookingOfOwner(bookerId, pageable);
                 break;
             case PAST:
-                result = bookingRepository.getPastBookingOfOwner(bookerId, LocalDateTime.now());
+                result = bookingRepository.getPastBookingOfOwner(bookerId, LocalDateTime.now(), pageable);
                 break;
             case FUTURE:
-                result = bookingRepository.getFutureBookingOfOwner(bookerId, LocalDateTime.now());
+                result = bookingRepository.getFutureBookingOfOwner(bookerId, LocalDateTime.now(), pageable);
                 break;
             case CURRENT:
-                result = bookingRepository.getCurrentBookingOfOwner(bookerId, LocalDateTime.now());
+                result = bookingRepository.getCurrentBookingOfOwner(bookerId, LocalDateTime.now(), pageable);
                 break;
             default:
-                result = bookingRepository.getRejectedOrWaitingBookingOfOwner(bookerId, Status.valueOf(state.toString()));
+                result = bookingRepository.getRejectedOrWaitingBookingOfOwner(bookerId,
+                        Status.valueOf(state.toString()),
+                        pageable);
                 break;
 
 

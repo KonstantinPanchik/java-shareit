@@ -1,5 +1,7 @@
 package ru.practicum.shareit.booking.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -24,67 +26,67 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     @Query("select b from Booking as b join fetch b.booker as u " +
             "join fetch b.item as i " +
-            "WHERE i.id=?1 AND b.start>?2 AND b.status=?3 ORDER BY b.start ")
+            "WHERE i.id=?1 AND b.start>?2 AND b.status=?3  ")
     List<Booking> findNextByItem(Long aLong, LocalDateTime now, Status status);
 
     @Query("select b from Booking as b join fetch b.booker as u " +
             "join fetch b.item as i " +
-            "WHERE i.id=?1 AND b.start<?2 AND b.status=?3 ORDER BY b.start DESC ")
+            "WHERE i.id=?1 AND b.start<?2 AND b.status=?3  ")
     List<Booking> findLastByItem(Long aLong, LocalDateTime now, Status status);
 
-
+//ORDER BY b.start DESC
     //методы получения бронирований от букера
     @Query("select b from Booking as b join fetch b.booker as u " +
-            " WHERE u.id=?1 ORDER BY b.start DESC")
-    List<Booking> getAllBookingOfBooker(Long bookerId);
+            " WHERE u.id=?1 ")
+    List<Booking> getAllBookingOfBooker(Long bookerId, Pageable pageable);
 
     @Query("select b from Booking as b join fetch b.booker as u " +
-            " WHERE u.id=?1 and b.end<?2 ORDER BY b.start DESC")
-    List<Booking> getPastBookingOfBooker(Long bookerId, LocalDateTime now);
+            " WHERE u.id=?1 and b.end<?2 ")
+    List<Booking> getPastBookingOfBooker(Long bookerId, LocalDateTime now, Pageable pageable);
 
     @Query("select b from Booking as b join fetch b.booker as u " +
-            " WHERE u.id=?1 and b.start>?2 ORDER BY b.start DESC")
-    List<Booking> getFutureBookingOfBooker(Long bookerId, LocalDateTime now);
+            " WHERE u.id=?1 and b.start>?2 ")
+    List<Booking> getFutureBookingOfBooker(Long bookerId, LocalDateTime now, Pageable pageable);
 
     @Query("select b from Booking as b join fetch b.booker as u " +
-            " WHERE u.id=?1 and b.start<?2 AND b.end>?2 ORDER BY b.start DESC")
-    List<Booking> getCurrentBookingOfBooker(Long bookerId, LocalDateTime now);
+            " WHERE u.id=?1 and b.start<?2 AND b.end>?2 ")
+    List<Booking> getCurrentBookingOfBooker(Long bookerId, LocalDateTime now, Pageable pageable);
 
 
     @Query("select b from Booking as b join fetch b.booker as u " +
-            " WHERE u.id=?1 and b.status=?2 ORDER BY b.start DESC")
-    List<Booking> getRejectedOrWaitingBookingOfBooker(Long bookerId, Status status);
+            " WHERE u.id=?1 and b.status=?2 ")
+    List<Booking> getRejectedOrWaitingBookingOfBooker(Long bookerId, Status status, Pageable pageable);
 
     //методы получения бронирований от хозяина
     @Query("select b from Booking as b join fetch b.booker as u " +
             "join fetch b.item as i " +
             "join fetch i.user as ow " +
-            "WHERE ow.id=?1 ORDER BY b.start DESC")
-    List<Booking> getAllBookingOfOwner(Long bookerId);
+            "WHERE ow.id=?1 ")
+    List<Booking> getAllBookingOfOwner(Long bookerId, Pageable pageable);
 
     @Query("select b from Booking as b join fetch b.booker as u " +
             "join fetch b.item as i " +
             "join fetch i.user as ow " +
-            "WHERE ow.id=?1 AND b.end<?2 ORDER BY b.start DESC")
-    List<Booking> getPastBookingOfOwner(Long bookerId, LocalDateTime now);
+            "WHERE ow.id=?1 AND b.end<?2 ")
+    List<Booking> getPastBookingOfOwner(Long bookerId, LocalDateTime now, Pageable pageable);
 
     @Query("select b from Booking as b join fetch b.booker as u " +
             "join fetch b.item as i " +
             "join fetch i.user as ow " +
-            "WHERE ow.id=?1 AND b.start>?2 ORDER BY b.start DESC")
-    List<Booking> getFutureBookingOfOwner(Long bookerId, LocalDateTime now);
+            "WHERE ow.id=?1 AND b.start>?2 ")
+    List<Booking> getFutureBookingOfOwner(Long bookerId, LocalDateTime now, Pageable pageable);
 
     @Query("select b from Booking as b join fetch b.booker as u " +
             "join fetch b.item as i " +
             "join fetch i.user as ow " +
-            "WHERE ow.id=?1 AND b.start<?2 AND b.end>?2 ORDER BY b.start DESC")
-    List<Booking> getCurrentBookingOfOwner(Long bookerId, LocalDateTime now);
+            "WHERE ow.id=?1 AND b.start<?2 AND b.end>?2 ")
+    List<Booking> getCurrentBookingOfOwner(Long bookerId, LocalDateTime now, Pageable pageable);
 
     @Query("select b from Booking as b join fetch b.booker as u " +
             "join fetch b.item as i " +
             "join fetch i.user as ow " +
-            "WHERE ow.id=?1 AND b.status=?2 ORDER BY b.start DESC")
-    List<Booking> getRejectedOrWaitingBookingOfOwner(Long bookerId, Status status);
+            "WHERE ow.id=?1 AND b.status=?2 ")
+    List<Booking> getRejectedOrWaitingBookingOfOwner(Long bookerId, Status status, Pageable pageable);
 
 
 }
