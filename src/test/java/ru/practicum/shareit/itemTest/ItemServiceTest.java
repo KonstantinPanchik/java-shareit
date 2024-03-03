@@ -123,6 +123,7 @@ public class ItemServiceTest {
 
     }
 
+
     @Test
     public void shouldUpdateDescription() {
         ItemCreationDto dto = ItemCreationDto.builder().description("newDescription").build();
