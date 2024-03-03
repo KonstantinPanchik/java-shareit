@@ -50,7 +50,7 @@ public class ItemServiceTest {
     ItemService service;
 
     @Test
-    public void ShouldAddItem() {
+    public void shouldAddItem() {
         when(userService.getUser(anyLong()))
                 .thenReturn(testUser());
 
@@ -75,7 +75,7 @@ public class ItemServiceTest {
     }
 
     @Test
-    public void ShouldAddItemWithRequest() {
+    public void shouldAddItemWithRequest() {
         when(userService.getUser(anyLong()))
                 .thenReturn(testUser());
 
@@ -170,7 +170,7 @@ public class ItemServiceTest {
         when(bookingRepository.findLastByItem(anyLong(), any(), any()))
                 .thenReturn(List.of(testLastBooking(new User(31L, "user31", "user31@mail.ru"))));
         when(bookingRepository.findNextByItem(anyLong(), any(), any()))
-                .thenReturn(List.of(testLastBooking(new User(41L, "user41", "user41@mail.ru"))));
+                .thenReturn(List.of(testNextBooking(new User(41L, "user41", "user41@mail.ru"))));
 
 
         ItemResponseDto responseDto = service.getItem(2L, 1341L);
@@ -226,13 +226,12 @@ public class ItemServiceTest {
     }
 
 
-
     private User testUser() {
         return new User(1L, "name", "emai@mail.ru");
     }
 
     private Item testItem(User user) {
-        Item item = Item.builder()
+        return Item.builder()
                 .id(2L)
                 .name("OldName")
                 .description("OldDescription")
@@ -241,7 +240,7 @@ public class ItemServiceTest {
                 .available(false)
                 .request(null)
                 .build();
-        return item;
+
     }
 
     private ItemRequest testRequest() {
@@ -253,22 +252,21 @@ public class ItemServiceTest {
     }
 
     private Booking testNextBooking(User user) {
-        Booking booking = Booking.builder()
+        return Booking.builder()
                 .id(4L)
                 .booker(user)
                 .start(LocalDateTime.now().minusDays(2))
                 .end(LocalDateTime.now().minusDays(1))
                 .build();
-        return booking;
+
     }
 
     private Booking testLastBooking(User user) {
-        Booking booking = Booking.builder()
+        return Booking.builder()
                 .id(3L)
                 .booker(user)
                 .start(LocalDateTime.now().minusDays(2))
                 .end(LocalDateTime.now().minusDays(1))
                 .build();
-        return booking;
     }
 }
