@@ -7,6 +7,7 @@ import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 
 @Data
@@ -44,4 +45,18 @@ public class Booking {
 
     public Booking() {
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Booking booking = (Booking) o;
+        return Objects.equals(id, booking.id)
+                && Objects.equals(start, booking.start)
+                && Objects.equals(end, booking.end)
+                && Objects.equals(item.getId(), booking.item.getId())
+                && Objects.equals(booker.getId(), booking.booker.getId())
+                && status == booking.status;
+    }
+
 }

@@ -11,7 +11,6 @@ import ru.practicum.shareit.booking.StateOfBookings;
 import ru.practicum.shareit.booking.Status;
 import ru.practicum.shareit.booking.dto.BookingCreationDto;
 import ru.practicum.shareit.booking.dto.BookingMapper;
-import ru.practicum.shareit.booking.dto.BookingResponseDto;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exception.AccessIsDeniedException;
 import ru.practicum.shareit.exception.ItemNotAvailableException;
@@ -19,26 +18,25 @@ import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.repository.UserRepository;
+import ru.practicum.shareit.user.service.UserService;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 
 @Service
 @RequiredArgsConstructor
 public class BookingServiceImp implements BookingService {
 
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final ItemRepository itemRepository;
     private final BookingRepository bookingRepository;
 
     @Override
-    public BookingResponseDto addBooking(Long bookerId, BookingCreationDto bcd) {
+    public Booking addBooking(Long bookerId, BookingCreationDto bcd) {
 
-        User booker = userRepository.findById(bookerId).orElseThrow(() -> new NotFoundException("User not found"));
+        User booker = userService.getUser(bookerId);
         Item item = itemRepository.findById(bcd.getItemId()).orElseThrow(() -> new NotFoundException("Item not found"));
 
         if (item.getAvailable() == false) {
@@ -52,12 +50,12 @@ public class BookingServiceImp implements BookingService {
         Booking booking = BookingMapper.toBookingFromCreation(bcd, booker, item);
         booking = bookingRepository.save(booking);
 
-        return BookingMapper.toBookingResponse(booking);
+        return booking;
     }
 
 
     @Override
-    public BookingResponseDto setAppove(Long userId, Long bookingId, Boolean approved) {
+    public Booking setAppove(Long userId, Long bookingId, Boolean approved) {
         Optional<Booking> booking1 = bookingRepository.findById(bookingId);
         Booking booking = booking1.orElseThrow(() -> new NotFoundException("Booking has been not found "));
         boolean isOwner = booking.getItem().getUser().getId().equals(userId);
@@ -71,66 +69,57 @@ public class BookingServiceImp implements BookingService {
         booking.setStatus(newStatus);
         booking = bookingRepository.save(booking);
 
-        return BookingMapper.toBookingResponse(booking);
+        return booking;
     }
 
     @Override
-    public BookingResponseDto getBookingOfBooker(Long userId, Long bookingId) {
+    public Booking getBookingOfBooker(Long userId, Long bookingId) {
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new NotFoundException());
         if ((!userId.equals(booking.getBooker().getId())) && (!userId.equals(booking.getItem().getUser().getId()))) {
             throw new AccessIsDeniedException("You can't see item with id " + bookingId);
         }
 
-        return BookingMapper.toBookingResponse(booking);
+        return booking;
     }
 
     @Override
-    public List<BookingResponseDto> getAllBookingOfBooker(Long bookerId,
-                                                          StateOfBookings state,
-                                                          Integer from,
-                                                          Integer size) {
-        User booker = userRepository.findById(bookerId).orElseThrow(() -> new NotFoundException("User not found"));
+    public List<Booking> getAllBookingOfBooker(Long bookerId,
+                                               StateOfBookings state,
+                                               Integer from,
+                                               Integer size) {
+        userService.getUser(bookerId);
         Pageable pageable = PageRequest.of(from / size, size, Sort.by("start").descending());
         List<Booking> result;
         switch (state) {
 
             case ALL:
-                result = bookingRepository.getAllBookingOfBooker(bookerId, pageable)//.getContent()
-                ;
+                result = bookingRepository.getAllBookingOfBooker(bookerId, pageable);
                 break;
             case PAST:
-                result = bookingRepository.getPastBookingOfBooker(bookerId, LocalDateTime.now(), pageable)
-                // .getContent()
-                ;
+                result = bookingRepository.getPastBookingOfBooker(bookerId, LocalDateTime.now(), pageable);
                 break;
             case FUTURE:
-                result = bookingRepository.getFutureBookingOfBooker(bookerId, LocalDateTime.now(), pageable)
-                ;
+                result = bookingRepository.getFutureBookingOfBooker(bookerId, LocalDateTime.now(), pageable);
                 break;
             case CURRENT:
-                result = bookingRepository.getCurrentBookingOfBooker(bookerId, LocalDateTime.now(), pageable)
-                ;
+                result = bookingRepository.getCurrentBookingOfBooker(bookerId, LocalDateTime.now(), pageable);
                 break;
             default:
-
                 result = bookingRepository
-                        .getRejectedOrWaitingBookingOfBooker(bookerId, Status.valueOf(state.toString()), pageable)
-                ;
+                        .getRejectedOrWaitingBookingOfBooker(bookerId, Status.valueOf(state.toString()), pageable);
                 break;
 
 
         }
-        return result.stream()
-                .map(BookingMapper::toBookingResponse)
-                .collect(Collectors.toList());
+        return result;
     }
 
     @Override
-    public List<BookingResponseDto> getBookingOfOwner(Long bookerId,
-                                                      StateOfBookings state,
-                                                      Integer from,
-                                                      Integer size) {
-        User booker = userRepository.findById(bookerId).orElseThrow(() -> new NotFoundException("User not found"));
+    public List<Booking> getBookingOfOwner(Long bookerId,
+                                           StateOfBookings state,
+                                           Integer from,
+                                           Integer size) {
+        User booker = userService.getUser(bookerId);
         Pageable pageable = PageRequest.of(from / size, size, Sort.by("start").descending());
         List<Booking> result;
         switch (state) {
@@ -155,9 +144,7 @@ public class BookingServiceImp implements BookingService {
 
 
         }
-        return result.stream()
-                .map(BookingMapper::toBookingResponse)
-                .collect(Collectors.toList());
+        return result;
     }
 
 

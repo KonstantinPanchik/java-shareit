@@ -8,21 +8,14 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
 public class BookingMapper {
-    public static Booking toBookingFromCreation(BookingCreationDto bookingCreationDto) {
-        Booking booking = Booking.builder()
-                .start(bookingCreationDto.start)
-                .end(bookingCreationDto.end)
-                .status(Status.WAITING)
-                .build();
-        return booking;
-    }
 
     public static Booking toBookingFromCreation(BookingCreationDto bookingCreationDto, User booker, Item item) {
         Booking booking = Booking.builder()
                 .start(bookingCreationDto.start)
                 .end(bookingCreationDto.end)
                 .status(Status.WAITING)
-                .item(item).booker(booker)
+                .item(item)
+                .booker(booker)
                 .build();
         return booking;
     }

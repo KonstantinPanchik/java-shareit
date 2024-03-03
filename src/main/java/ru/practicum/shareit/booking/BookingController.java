@@ -6,12 +6,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingCreationDto;
+import ru.practicum.shareit.booking.dto.BookingMapper;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.exception.UnknownStateException;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -27,20 +29,23 @@ public class BookingController {
     public ResponseEntity createNewBooking(@RequestHeader("X-Sharer-User-Id") @NotNull Long userId,
                                            @RequestBody @Valid BookingCreationDto bookingCreationDto) {
 
-        return ResponseEntity.ok(bookingService.addBooking(userId, bookingCreationDto));
+        Booking booking = bookingService.addBooking(userId, bookingCreationDto);
+        return ResponseEntity.ok(BookingMapper.toBookingResponse(booking));
     }
 
     @PatchMapping("/{bookingId}")
     public ResponseEntity setApprove(@RequestHeader("X-Sharer-User-Id") @NotNull Long userId,
                                      @PathVariable Long bookingId,
                                      @RequestParam Boolean approved) {
-        return ResponseEntity.ok(bookingService.setAppove(userId, bookingId, approved));
+        Booking booking = bookingService.setAppove(userId, bookingId, approved);
+        return ResponseEntity.ok(BookingMapper.toBookingResponse(booking));
     }
 
     @GetMapping("/{bookingId}")
     public ResponseEntity getBooking(@RequestHeader("X-Sharer-User-Id") @NotNull Long userId,
                                      @PathVariable Long bookingId) {
-        return ResponseEntity.ok(bookingService.getBookingOfBooker(userId, bookingId));
+        Booking booking = bookingService.getBookingOfBooker(userId, bookingId);
+        return ResponseEntity.ok(BookingMapper.toBookingResponse(booking));
     }
 
     @GetMapping
@@ -51,7 +56,10 @@ public class BookingController {
         StateOfBookings stateOfBookings = StateOfBookings.from(state)
                 .orElseThrow(() -> new UnknownStateException("Unknown state: " + state));
 
-        return ResponseEntity.ok(bookingService.getAllBookingOfBooker(userId, stateOfBookings, from, size));
+        return ResponseEntity.ok(bookingService.getAllBookingOfBooker(userId, stateOfBookings, from, size)
+                .stream()
+                .map(BookingMapper::toBookingResponse)
+                .collect(Collectors.toList()));
     }
 
     @GetMapping("/owner")
@@ -62,7 +70,10 @@ public class BookingController {
         StateOfBookings stateOfBookings = StateOfBookings.from(state)
                 .orElseThrow(() -> new UnknownStateException("Unknown state: " + state));
 
-        return ResponseEntity.ok(bookingService.getBookingOfOwner(userId, stateOfBookings, from, size));
+        return ResponseEntity.ok(bookingService.getBookingOfOwner(userId, stateOfBookings, from, size)
+                .stream()
+                .map(BookingMapper::toBookingResponse)
+                .collect(Collectors.toList()));
     }
 
 }
