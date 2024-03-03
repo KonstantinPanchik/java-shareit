@@ -59,4 +59,8 @@ public class Booking {
                 && status == booking.status;
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, start, end, item.getId(), booker.getId(), status);
+    }
 }
