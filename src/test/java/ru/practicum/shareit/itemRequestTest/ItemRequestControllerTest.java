@@ -32,16 +32,23 @@ public class ItemRequestControllerTest {
     ObjectMapper mapper;
 
     @MockBean
-    ItemRequestService itemRequestServiceService;
+    ItemRequestService itemRequestService;
 
     @Autowired
     MockMvc mockMvc;
 
     ItemRequest itemRequest = ItemRequest.builder().description("Нужна газонокосилка").build();
 
+    ItemRequestDto itemRequestDto = ItemRequestDto.builder()
+            .description("Нужна газонокосилка")
+            .id(1L)
+            .created(LocalDateTime.of(2001, 9, 11, 10, 55, 48))
+            .items(new ArrayList<>())
+            .build();
+
     @Test
     public void saveItemRequest() throws Exception {
-        when(itemRequestServiceService.addRequest(itemRequest, 1L))
+        when(itemRequestService.addRequest(itemRequest, 1L))
                 .thenReturn(itemRequestDto);
 
 
@@ -60,7 +67,7 @@ public class ItemRequestControllerTest {
 
     @Test
     public void getItemRequest() throws Exception {
-        when(itemRequestServiceService.getRequest(anyLong(), anyLong()))
+        when(itemRequestService.getRequest(anyLong(), anyLong()))
                 .thenReturn(itemRequestDto);
 
 
@@ -80,7 +87,7 @@ public class ItemRequestControllerTest {
     @Test
     public void getAllItemRequest() throws Exception {
 
-        when(itemRequestServiceService.getRequests(1L))
+        when(itemRequestService.getRequests(1L))
                 .thenReturn(getRequests());
 
 
@@ -98,7 +105,7 @@ public class ItemRequestControllerTest {
     @Test
     public void getAllRequests() throws Exception {
 
-        when(itemRequestServiceService.getRequestsNotCurrentUser(anyInt(), anyInt(), anyLong()))
+        when(itemRequestService.getRequestsNotCurrentUser(anyInt(), anyInt(), anyLong()))
                 .thenReturn(getRequests());
 
 
@@ -113,12 +120,6 @@ public class ItemRequestControllerTest {
 
     }
 
-    ItemRequestDto itemRequestDto = ItemRequestDto.builder()
-            .description("Нужна газонокосилка")
-            .id(1L)
-            .created(LocalDateTime.of(2001, 9, 11, 10, 55, 48))
-            .items(new ArrayList<>())
-            .build();
 
     private List<ItemRequestDto> getRequests() {
 

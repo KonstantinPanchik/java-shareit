@@ -152,10 +152,6 @@ public class BookingControllerTest {
 
     }
 
-
-// TODO: 02.03.2024 наделать проверки с листами  
-
-
     private List<Booking> bookings(int length) {
         User booker = new User(1L, "vitya", "vitya@mail.ru");
         User owner = new User(2L, "vova", "vova@mail.ru");

@@ -22,7 +22,7 @@ import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.repository.UserRepository;
+import ru.practicum.shareit.user.service.UserService;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -35,14 +35,14 @@ import java.util.stream.Collectors;
 public class ItemServiceImp implements ItemService {
 
     private final ItemRepository itemRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
     private final ItemRequestRepository requestRepository;
 
     @Override
     public ItemResponseDto addItem(ItemCreationDto itemCreationDto, Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User"));
+        User user = userService.getUser(userId);
         Item item = ItemMapper.fromCreatingDto(itemCreationDto);
         item.setUser(user);
         item.setComments(new ArrayList<Comment>());
@@ -66,35 +66,20 @@ public class ItemServiceImp implements ItemService {
         item = ItemMapper.updateNotNullFromDto(itemCreationDto, item);
         itemRepository.save(item);
 
-        Booking last = bookingRepository
-                .findLastByItem(itemId, LocalDateTime.now(), Status.APPROVED).stream().findFirst().orElse(null);
-        ItemResponseDto.BookingDto lastDto = BookingMapper.toItemBookingDto(last);
-
-        Booking next = bookingRepository
-                .findNextByItem(itemId, LocalDateTime.now(), Status.APPROVED).stream().findFirst().orElse(null);
-        ItemResponseDto.BookingDto nextDto = BookingMapper.toItemBookingDto(next);
-
-
-        return ItemMapper.toResponseDto(item, lastDto, nextDto);
+        return setBookings(item);
     }
 
     @Override
     public ItemResponseDto getItem(Long itemId, Long userId) {
         Item item = itemRepository.findById(itemId).orElseThrow(() -> new NotFoundException("Item"));
 
-        Booking last = null;
-        Booking next = null;
         if (item.getUser().getId().equals(userId)) {
-            last = bookingRepository
-                    .findLastByItem(itemId, LocalDateTime.now(), Status.APPROVED).stream().findFirst().orElse(null);
 
-            next = bookingRepository
-                    .findNextByItem(itemId, LocalDateTime.now(), Status.APPROVED).stream().findFirst().orElse(null);
+            return setBookings(item);
+        } else {
+
+            return ItemMapper.toResponseDto(item);
         }
-
-        return ItemMapper.toResponseDto(item,
-                BookingMapper.toItemBookingDto(last),
-                BookingMapper.toItemBookingDto(next));
     }
 
     @Override
@@ -102,19 +87,7 @@ public class ItemServiceImp implements ItemService {
 
         return itemRepository.userItems(userId, PageRequest.of(from / size, size, Sort.by("id")))
                 .stream()
-                .map(item -> {
-                    Booking last = bookingRepository
-                            .findLastByItem(item.getId(), LocalDateTime.now(), Status.APPROVED).stream().findFirst().orElse(null);
-                    ItemResponseDto.BookingDto lastDto = BookingMapper.toItemBookingDto(last);
-
-                    Booking next = bookingRepository
-                            .findNextByItem(item.getId(), LocalDateTime.now(), Status.APPROVED).stream().findFirst().orElse(null);
-                    ItemResponseDto.BookingDto nextDto = BookingMapper.toItemBookingDto(next);
-
-
-                    return ItemMapper.toResponseDto(item, lastDto, nextDto);
-
-                })
+                .map(item -> setBookings(item))
                 .collect(Collectors.toList());
     }
 
@@ -131,7 +104,7 @@ public class ItemServiceImp implements ItemService {
 
     @Override
     public ItemResponseDto.CommentDto addComment(Comment comment, Long userId, Long itemId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User"));
+        User user = userService.getUser(userId);
         List<Booking> bookings = bookingRepository.findByItemAndBooker(itemId, userId, LocalDateTime.now());
         if (bookings.isEmpty()) {
             throw new ItemNotAvailableException("You didn't book this item");
@@ -141,6 +114,22 @@ public class ItemServiceImp implements ItemService {
         comment.setCreated(LocalDateTime.now());
         commentRepository.save(comment);
         return ItemMapper.toCommentDto(comment);
+
+    }
+
+    private ItemResponseDto setBookings(Item item) {
+
+        Booking last = bookingRepository
+                .findLastByItem(item.getId(), LocalDateTime.now(), Status.APPROVED).stream().findFirst().orElse(null);
+        ItemResponseDto.BookingDto lastDto = BookingMapper.toItemBookingDto(last);
+
+        Booking next = bookingRepository
+                .findNextByItem(item.getId(), LocalDateTime.now(), Status.APPROVED).stream().findFirst().orElse(null);
+        ItemResponseDto.BookingDto nextDto = BookingMapper.toItemBookingDto(next);
+
+
+        return ItemMapper.toResponseDto(item, lastDto, nextDto);
+
 
     }
 }

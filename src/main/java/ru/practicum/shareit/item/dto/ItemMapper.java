@@ -68,7 +68,8 @@ public class ItemMapper {
         ItemResponseDto.CommentDto dto = ItemResponseDto.CommentDto.builder()
                 .text(comment.getText())
                 .authorName(comment.getAuthor().getName())
-                .id(comment.getId()).created(comment.getCreated())
+                .id(comment.getId())
+                .created(comment.getCreated())
                 .build();
         return dto;
     }
