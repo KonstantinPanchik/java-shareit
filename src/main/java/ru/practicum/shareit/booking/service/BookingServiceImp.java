@@ -74,7 +74,8 @@ public class BookingServiceImp implements BookingService {
 
     @Override
     public Booking getBookingOfBooker(Long userId, Long bookingId) {
-        Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new NotFoundException());
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new NotFoundException("Booking not found"));
         if ((!userId.equals(booking.getBooker().getId())) && (!userId.equals(booking.getItem().getUser().getId()))) {
             throw new AccessIsDeniedException("You can't see item with id " + bookingId);
         }
