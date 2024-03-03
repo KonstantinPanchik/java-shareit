@@ -122,6 +122,38 @@ public class ItemServiceTest {
         assertEquals(responseDto.getDescription(), "OldDescription");
 
     }
+    @Test
+    public void shouldUpdateDescription() {
+        ItemCreationDto dto = ItemCreationDto.builder().description("newDescription").build();
+
+        when(itemRepository.findById(anyLong()))
+                .thenReturn(Optional.of(testItem(testUser())));
+
+        when(bookingRepository.findLastByItem(anyLong(), any(), any()))
+                .thenReturn(new ArrayList<>());
+        when(bookingRepository.findNextByItem(anyLong(), any(), any()))
+                .thenReturn(new ArrayList<>());
+
+        ItemResponseDto responseDto = service.updateItem(dto, 1L, 2L);
+        assertEquals(responseDto.getDescription(), dto.getDescription());
+
+    }
+    @Test
+    public void shouldUpdateAvailable() {
+        ItemCreationDto dto = ItemCreationDto.builder().available(true).build();
+
+        when(itemRepository.findById(anyLong()))
+                .thenReturn(Optional.of(testItem(testUser())));
+
+        when(bookingRepository.findLastByItem(anyLong(), any(), any()))
+                .thenReturn(new ArrayList<>());
+        when(bookingRepository.findNextByItem(anyLong(), any(), any()))
+                .thenReturn(new ArrayList<>());
+
+        ItemResponseDto responseDto = service.updateItem(dto, 1L, 2L);
+        assertEquals(responseDto.getAvailable(), dto.getAvailable());
+
+    }
 
     @Test
     public void shouldNotUpdateName() {
