@@ -261,6 +261,58 @@ public class ItemServiceTest {
     }
 
 
+    @Test
+    public void shouldGetItems() {
+
+        when(itemRepository.userItems(anyLong(), any()))
+                .thenReturn(List.of(
+                        Item.builder()
+                                .id(1L)
+                                .comments(new ArrayList<>())
+                                .build(),
+                        Item.builder()
+                                .id(2L)
+                                .comments(new ArrayList<>())
+                                .build()
+
+                ));
+
+        List<ItemResponseDto> result = service.getUserItems(1L, 0, 1);
+        assertEquals(result.get(0).getId(), 1L);
+        assertEquals(result.get(1).getId(), 2L);
+    }
+
+    @Test
+    public void shouldGetItemsSearch() {
+
+        when(itemRepository.search(any(), any()))
+                .thenReturn(List.of(
+                        Item.builder()
+                                .id(1L)
+                                .comments(new ArrayList<>())
+                                .build(),
+                        Item.builder()
+                                .id(2L)
+                                .comments(new ArrayList<>())
+                                .build()
+
+                ));
+
+        List<ItemResponseDto> result = service.search("text", 0, 1);
+        assertEquals(result.get(0).getId(), 1L);
+        assertEquals(result.get(1).getId(), 2L);
+    }
+
+    @Test
+    public void shouldEmptyItemsSearch() {
+
+        List<ItemResponseDto> resultTextNull = service.search(null, 0, 1);
+        List<ItemResponseDto> resultTextBlank = service.search("", 0, 1);
+
+        assertTrue(resultTextNull.isEmpty());
+        assertTrue(resultTextBlank.isEmpty());
+    }
+
     private User testUser() {
         return new User(1L, "name", "emai@mail.ru");
     }
