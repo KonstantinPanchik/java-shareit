@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.practicum.shareit.booking.Booking;
+import ru.practicum.shareit.booking.StateOfBookings;
 import ru.practicum.shareit.booking.Status;
 import ru.practicum.shareit.booking.dto.BookingCreationDto;
 import ru.practicum.shareit.booking.service.BookingService;
@@ -19,6 +20,7 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -196,6 +198,316 @@ public class BookingServiceTest {
 
         assertThrows(AccessIsDeniedException.class,
                 () -> bookingService.getBookingOfBooker(user3.getId(), savedbooking.getId()));
+
+
+    }
+
+    @Test
+    public void shouldGetAllBookings() {
+        BookingCreationDto bookingCreationDto = new BookingCreationDto();
+        bookingCreationDto.setItemId(item1.getId());
+        bookingCreationDto.setStart(LocalDateTime.now().plusDays(1));
+        bookingCreationDto.setEnd(LocalDateTime.now().plusDays(2));
+
+        bookingService.addBooking(user2.getId(), bookingCreationDto);
+
+        BookingCreationDto bookingCreationDto2 = new BookingCreationDto();
+        bookingCreationDto2.setItemId(item1.getId());
+        bookingCreationDto2.setStart(LocalDateTime.now().plusDays(3));
+        bookingCreationDto2.setEnd(LocalDateTime.now().plusDays(4));
+
+        bookingService.addBooking(user2.getId(), bookingCreationDto2);
+
+
+        List<Booking> bookingsOfBooker = bookingService.getAllBookingOfBooker(user2.getId(),
+                StateOfBookings.ALL,
+                0, 10);
+
+        assertEquals(bookingsOfBooker.size(), 2);
+
+
+    }
+
+    @Test
+    public void shouldGetFutureBookings() {
+        BookingCreationDto bookingCreationDto = new BookingCreationDto();
+        bookingCreationDto.setItemId(item1.getId());
+        bookingCreationDto.setStart(LocalDateTime.now().plusDays(1));
+        bookingCreationDto.setEnd(LocalDateTime.now().plusDays(2));
+
+        bookingService.addBooking(user2.getId(), bookingCreationDto);
+
+        BookingCreationDto bookingCreationDto2 = new BookingCreationDto();
+        bookingCreationDto2.setItemId(item1.getId());
+        bookingCreationDto2.setStart(LocalDateTime.now().plusDays(3));
+        bookingCreationDto2.setEnd(LocalDateTime.now().plusDays(4));
+
+        bookingService.addBooking(user2.getId(), bookingCreationDto2);
+
+
+        List<Booking> bookingsOfBooker = bookingService.getAllBookingOfBooker(user2.getId(),
+                StateOfBookings.FUTURE,
+                0, 10);
+
+        assertEquals(bookingsOfBooker.size(), 2);
+
+
+    }
+
+    @Test
+    public void shouldGetPastBookings() {
+        BookingCreationDto bookingCreationDto = new BookingCreationDto();
+        bookingCreationDto.setItemId(item1.getId());
+        bookingCreationDto.setStart(LocalDateTime.now().minusDays(5));
+        bookingCreationDto.setEnd(LocalDateTime.now().minusDays(4));
+
+        bookingService.addBooking(user2.getId(), bookingCreationDto);
+
+        BookingCreationDto bookingCreationDto2 = new BookingCreationDto();
+        bookingCreationDto2.setItemId(item1.getId());
+        bookingCreationDto2.setStart(LocalDateTime.now().minusDays(3));
+        bookingCreationDto2.setEnd(LocalDateTime.now().minusDays(2));
+
+        bookingService.addBooking(user2.getId(), bookingCreationDto2);
+
+
+        List<Booking> bookingsOfBooker = bookingService.getAllBookingOfBooker(user2.getId(),
+                StateOfBookings.PAST,
+                0, 10);
+
+        assertEquals(bookingsOfBooker.size(), 2);
+
+
+    }
+
+    @Test
+    public void shouldGetCurrentBookings() {
+        BookingCreationDto bookingCreationDto = new BookingCreationDto();
+        bookingCreationDto.setItemId(item1.getId());
+        bookingCreationDto.setStart(LocalDateTime.now().minusDays(5));
+        bookingCreationDto.setEnd(LocalDateTime.now().plusDays(4));
+
+        bookingService.addBooking(user2.getId(), bookingCreationDto);
+
+        BookingCreationDto bookingCreationDto2 = new BookingCreationDto();
+        bookingCreationDto2.setItemId(item1.getId());
+        bookingCreationDto2.setStart(LocalDateTime.now().minusDays(3));
+        bookingCreationDto2.setEnd(LocalDateTime.now().minusDays(2));
+
+        bookingService.addBooking(user2.getId(), bookingCreationDto2);
+
+
+        List<Booking> bookingsOfBooker = bookingService.getAllBookingOfBooker(user2.getId(),
+                StateOfBookings.CURRENT,
+                0, 10);
+
+        assertEquals(bookingsOfBooker.size(), 1);
+
+
+    }
+
+    @Test
+    public void shouldGetWaitingBookings() {
+        BookingCreationDto bookingCreationDto = new BookingCreationDto();
+        bookingCreationDto.setItemId(item1.getId());
+        bookingCreationDto.setStart(LocalDateTime.now().minusDays(5));
+        bookingCreationDto.setEnd(LocalDateTime.now().plusDays(4));
+
+        bookingService.addBooking(user2.getId(), bookingCreationDto);
+
+        BookingCreationDto bookingCreationDto2 = new BookingCreationDto();
+        bookingCreationDto2.setItemId(item1.getId());
+        bookingCreationDto2.setStart(LocalDateTime.now().minusDays(3));
+        bookingCreationDto2.setEnd(LocalDateTime.now().minusDays(2));
+
+        bookingService.addBooking(user2.getId(), bookingCreationDto2);
+
+
+        List<Booking> bookingsOfBooker = bookingService.getAllBookingOfBooker(user2.getId(),
+                StateOfBookings.WAITING,
+                0, 10);
+
+        assertEquals(bookingsOfBooker.size(), 2);
+    }
+
+    @Test
+    public void shouldGetRejectedBookings() {
+        BookingCreationDto bookingCreationDto = new BookingCreationDto();
+        bookingCreationDto.setItemId(item1.getId());
+        bookingCreationDto.setStart(LocalDateTime.now().minusDays(5));
+        bookingCreationDto.setEnd(LocalDateTime.now().plusDays(4));
+
+        Booking booking = bookingService.addBooking(user2.getId(), bookingCreationDto);
+        bookingService.setAppove(user1.getId(), booking.getId(), false);
+
+        BookingCreationDto bookingCreationDto2 = new BookingCreationDto();
+        bookingCreationDto2.setItemId(item1.getId());
+        bookingCreationDto2.setStart(LocalDateTime.now().minusDays(3));
+        bookingCreationDto2.setEnd(LocalDateTime.now().minusDays(2));
+
+        bookingService.addBooking(user2.getId(), bookingCreationDto2);
+
+
+        List<Booking> rejectedBookingsOfBooker = bookingService.getAllBookingOfBooker(user2.getId(),
+                StateOfBookings.REJECTED,
+                0, 10);
+
+        assertEquals(rejectedBookingsOfBooker.size(), 1);
+
+
+    }
+
+    @Test
+    public void shouldGetAllBookingsOwner() {
+        BookingCreationDto bookingCreationDto = new BookingCreationDto();
+        bookingCreationDto.setItemId(item1.getId());
+        bookingCreationDto.setStart(LocalDateTime.now().plusDays(1));
+        bookingCreationDto.setEnd(LocalDateTime.now().plusDays(2));
+
+        bookingService.addBooking(user2.getId(), bookingCreationDto);
+
+        BookingCreationDto bookingCreationDto2 = new BookingCreationDto();
+        bookingCreationDto2.setItemId(item1.getId());
+        bookingCreationDto2.setStart(LocalDateTime.now().plusDays(3));
+        bookingCreationDto2.setEnd(LocalDateTime.now().plusDays(4));
+
+        bookingService.addBooking(user2.getId(), bookingCreationDto2);
+
+
+        List<Booking> bookingsOfBooker = bookingService.getBookingOfOwner(user1.getId(),
+                StateOfBookings.ALL,
+                0, 10);
+
+        assertEquals(bookingsOfBooker.size(), 2);
+
+
+    }
+
+    @Test
+    public void shouldGetFutureBookingsOwner() {
+        BookingCreationDto bookingCreationDto = new BookingCreationDto();
+        bookingCreationDto.setItemId(item1.getId());
+        bookingCreationDto.setStart(LocalDateTime.now().plusDays(1));
+        bookingCreationDto.setEnd(LocalDateTime.now().plusDays(2));
+
+        bookingService.addBooking(user2.getId(), bookingCreationDto);
+
+        BookingCreationDto bookingCreationDto2 = new BookingCreationDto();
+        bookingCreationDto2.setItemId(item1.getId());
+        bookingCreationDto2.setStart(LocalDateTime.now().plusDays(3));
+        bookingCreationDto2.setEnd(LocalDateTime.now().plusDays(4));
+
+        bookingService.addBooking(user2.getId(), bookingCreationDto2);
+
+
+        List<Booking> bookingsOfBooker = bookingService.getBookingOfOwner(user1.getId(),
+                StateOfBookings.FUTURE,
+                0, 10);
+
+        assertEquals(bookingsOfBooker.size(), 2);
+
+
+    }
+
+    @Test
+    public void shouldGetPastBookingsOwner() {
+        BookingCreationDto bookingCreationDto = new BookingCreationDto();
+        bookingCreationDto.setItemId(item1.getId());
+        bookingCreationDto.setStart(LocalDateTime.now().minusDays(5));
+        bookingCreationDto.setEnd(LocalDateTime.now().minusDays(4));
+
+        bookingService.addBooking(user2.getId(), bookingCreationDto);
+
+        BookingCreationDto bookingCreationDto2 = new BookingCreationDto();
+        bookingCreationDto2.setItemId(item1.getId());
+        bookingCreationDto2.setStart(LocalDateTime.now().minusDays(3));
+        bookingCreationDto2.setEnd(LocalDateTime.now().minusDays(2));
+
+        bookingService.addBooking(user2.getId(), bookingCreationDto2);
+
+
+        List<Booking> bookingsOfBooker = bookingService.getBookingOfOwner(user1.getId(),
+                StateOfBookings.PAST,
+                0, 10);
+
+        assertEquals(bookingsOfBooker.size(), 2);
+
+
+    }
+
+    @Test
+    public void shouldGetCurrentBookingsOwner() {
+        BookingCreationDto bookingCreationDto = new BookingCreationDto();
+        bookingCreationDto.setItemId(item1.getId());
+        bookingCreationDto.setStart(LocalDateTime.now().minusDays(5));
+        bookingCreationDto.setEnd(LocalDateTime.now().plusDays(4));
+
+        bookingService.addBooking(user2.getId(), bookingCreationDto);
+
+        BookingCreationDto bookingCreationDto2 = new BookingCreationDto();
+        bookingCreationDto2.setItemId(item1.getId());
+        bookingCreationDto2.setStart(LocalDateTime.now().minusDays(3));
+        bookingCreationDto2.setEnd(LocalDateTime.now().minusDays(2));
+
+        bookingService.addBooking(user2.getId(), bookingCreationDto2);
+
+
+        List<Booking> bookingsOfBooker = bookingService.getBookingOfOwner(user1.getId(),
+                StateOfBookings.CURRENT,
+                0, 10);
+
+        assertEquals(bookingsOfBooker.size(), 1);
+
+
+    }
+
+    @Test
+    public void shouldGetWaitingBookingsOwner() {
+        BookingCreationDto bookingCreationDto = new BookingCreationDto();
+        bookingCreationDto.setItemId(item1.getId());
+        bookingCreationDto.setStart(LocalDateTime.now().minusDays(5));
+        bookingCreationDto.setEnd(LocalDateTime.now().plusDays(4));
+
+        bookingService.addBooking(user2.getId(), bookingCreationDto);
+
+        BookingCreationDto bookingCreationDto2 = new BookingCreationDto();
+        bookingCreationDto2.setItemId(item1.getId());
+        bookingCreationDto2.setStart(LocalDateTime.now().minusDays(3));
+        bookingCreationDto2.setEnd(LocalDateTime.now().minusDays(2));
+
+        bookingService.addBooking(user2.getId(), bookingCreationDto2);
+
+
+        List<Booking> bookingsOfBooker = bookingService.getBookingOfOwner(user1.getId(),
+                StateOfBookings.WAITING,
+                0, 10);
+
+        assertEquals(bookingsOfBooker.size(), 2);
+    }
+
+    @Test
+    public void shouldGetRejectedBookingsOwner() {
+        BookingCreationDto bookingCreationDto = new BookingCreationDto();
+        bookingCreationDto.setItemId(item1.getId());
+        bookingCreationDto.setStart(LocalDateTime.now().minusDays(5));
+        bookingCreationDto.setEnd(LocalDateTime.now().plusDays(4));
+
+        Booking booking = bookingService.addBooking(user2.getId(), bookingCreationDto);
+        bookingService.setAppove(user1.getId(), booking.getId(), false);
+
+        BookingCreationDto bookingCreationDto2 = new BookingCreationDto();
+        bookingCreationDto2.setItemId(item1.getId());
+        bookingCreationDto2.setStart(LocalDateTime.now().minusDays(3));
+        bookingCreationDto2.setEnd(LocalDateTime.now().minusDays(2));
+
+        bookingService.addBooking(user2.getId(), bookingCreationDto2);
+
+
+        List<Booking> rejectedBookingsOfBooker = bookingService.getBookingOfOwner(user1.getId(),
+                StateOfBookings.REJECTED,
+                0, 10);
+
+        assertEquals(rejectedBookingsOfBooker.size(), 1);
 
 
     }
