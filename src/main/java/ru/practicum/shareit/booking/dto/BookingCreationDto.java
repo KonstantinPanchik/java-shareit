@@ -1,5 +1,6 @@
 package ru.practicum.shareit.booking.dto;
 
+import lombok.Builder;
 import lombok.Data;
 
 import javax.validation.constraints.AssertTrue;
@@ -8,6 +9,7 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Data
+@Builder
 public class BookingCreationDto {
     @NotNull
     Long itemId;
@@ -26,6 +28,13 @@ public class BookingCreationDto {
         return end.isAfter(start);
     }
 
+    public BookingCreationDto() {
+    }
 
+    public BookingCreationDto(Long itemId, LocalDateTime start, LocalDateTime end) {
+        this.itemId = itemId;
+        this.start = start;
+        this.end = end;
+    }
 }
 

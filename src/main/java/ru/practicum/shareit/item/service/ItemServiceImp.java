@@ -2,6 +2,8 @@ package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.Status;
@@ -17,8 +19,10 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.repository.UserRepository;
+import ru.practicum.shareit.user.service.UserService;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -31,18 +35,24 @@ import java.util.stream.Collectors;
 public class ItemServiceImp implements ItemService {
 
     private final ItemRepository itemRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
-
+    private final ItemRequestRepository requestRepository;
 
     @Override
-
     public ItemResponseDto addItem(ItemCreationDto itemCreationDto, Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User"));
+        User user = userService.getUser(userId);
         Item item = ItemMapper.fromCreatingDto(itemCreationDto);
         item.setUser(user);
         item.setComments(new ArrayList<Comment>());
+
+        if (itemCreationDto.getRequestId() != null) {
+            ItemRequest itemRequest = requestRepository.findById(itemCreationDto.getRequestId())
+                    .orElseThrow(() -> new NotFoundException("Item Request with id " + itemCreationDto.getRequestId() +
+                            " not found"));
+            item.setRequest(itemRequest);
+        }
         itemRepository.save(item);
         return ItemMapper.toResponseDto(item);
     }
@@ -56,67 +66,48 @@ public class ItemServiceImp implements ItemService {
         item = ItemMapper.updateNotNullFromDto(itemCreationDto, item);
         itemRepository.save(item);
 
-        Booking last = bookingRepository
-                .findLastByItem(itemId, LocalDateTime.now(), Status.APPROVED).stream().findFirst().orElse(null);
-        ItemResponseDto.BookingDto lastDto = BookingMapper.toItemBookingDto(last);
-
-        Booking next = bookingRepository
-                .findNextByItem(itemId, LocalDateTime.now(), Status.APPROVED).stream().findFirst().orElse(null);
-        ItemResponseDto.BookingDto nextDto = BookingMapper.toItemBookingDto(next);
-
-
-        return ItemMapper.toResponseDto(item, lastDto, nextDto);
+        return setBookings(item, allApprovedBooking(List.of(item)));
     }
 
     @Override
     public ItemResponseDto getItem(Long itemId, Long userId) {
         Item item = itemRepository.findById(itemId).orElseThrow(() -> new NotFoundException("Item"));
 
-        Booking last = null;
-        Booking next = null;
         if (item.getUser().getId().equals(userId)) {
-            last = bookingRepository
-                    .findLastByItem(itemId, LocalDateTime.now(), Status.APPROVED).stream().findFirst().orElse(null);
 
-            next = bookingRepository
-                    .findNextByItem(itemId, LocalDateTime.now(), Status.APPROVED).stream().findFirst().orElse(null);
+            List<Booking> bookings = allApprovedBooking(List.of(item));
+
+            return setBookings(item, bookings);
+        } else {
+
+            return ItemMapper.toResponseDto(item);
         }
-
-        return ItemMapper.toResponseDto(item,
-                BookingMapper.toItemBookingDto(last),
-                BookingMapper.toItemBookingDto(next));
     }
 
     @Override
-    public List<ItemResponseDto> getUserItems(Long userId) {
-        return itemRepository.userItems(userId).stream()
-                .map(item -> {
-                    Booking last = bookingRepository
-                            .findLastByItem(item.getId(), LocalDateTime.now(), Status.APPROVED).stream().findFirst().orElse(null);
-                    ItemResponseDto.BookingDto lastDto = BookingMapper.toItemBookingDto(last);
+    public List<ItemResponseDto> getUserItems(Long userId, Integer from, Integer size) {
 
-                    Booking next = bookingRepository
-                            .findNextByItem(item.getId(), LocalDateTime.now(), Status.APPROVED).stream().findFirst().orElse(null);
-                    ItemResponseDto.BookingDto nextDto = BookingMapper.toItemBookingDto(next);
+        List<Item> items = itemRepository.userItems(userId, PageRequest.of(from / size, size, Sort.by("id")));
 
+        List<Booking> bookings = allApprovedBooking(items);
 
-                    return ItemMapper.toResponseDto(item, lastDto, nextDto);
+        return items.stream().map(item -> setBookings(item, bookings)).collect(Collectors.toList());
+    }
 
-                })
+    @Override
+    public List<ItemResponseDto> search(String text, Integer from, Integer size) {
+        if (text == null || text.isBlank()) {
+            return new ArrayList<>();
+        }
+        return itemRepository.search(text, PageRequest.of(from / size, size, Sort.by("id")))
+                .stream()
+                .map(ItemMapper::toResponseDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<ItemResponseDto> search(String text) {
-        if (text == null || text.isBlank()) {
-            return new ArrayList<>();
-        }
-        return itemRepository.search(text).stream().map(ItemMapper::toResponseDto).collect(Collectors.toList());
-    }
-
-    @Override
     public ItemResponseDto.CommentDto addComment(Comment comment, Long userId, Long itemId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User"));
+        User user = userService.getUser(userId);
         List<Booking> bookings = bookingRepository.findByItemAndBooker(itemId, userId, LocalDateTime.now());
         if (bookings.isEmpty()) {
             throw new ItemNotAvailableException("You didn't book this item");
@@ -127,5 +118,44 @@ public class ItemServiceImp implements ItemService {
         commentRepository.save(comment);
         return ItemMapper.toCommentDto(comment);
 
+    }
+
+    private ItemResponseDto setBookings(Item item, List<Booking> allApproved) {
+
+
+        Booking last = allApproved
+                .stream()
+                .filter(booking -> booking.getItem().getId().equals(item.getId()))
+                .filter(booking -> booking.getStart().isBefore(LocalDateTime.now()))
+                .sorted((o1, o2) -> {
+                    if (o1.getStart().isBefore(o2.getStart())) {
+                        return 1;
+                    } else {
+                        return -1;
+                    }
+                })
+                .findFirst().orElse(null);
+        ItemResponseDto.BookingDto lastDto = BookingMapper.toItemBookingDto(last);
+
+        Booking next = allApproved
+                .stream()
+                .filter(booking -> booking.getItem().getId().equals(item.getId()))
+                .filter(booking -> booking.getStart().isAfter(LocalDateTime.now()))
+                .sorted((o1, o2) -> {
+                    if (o1.getStart().isBefore(o2.getStart())) {
+                        return -1;
+                    } else {
+                        return 1;
+                    }
+                })
+                .findFirst().orElse(null);
+        ItemResponseDto.BookingDto nextDto = BookingMapper.toItemBookingDto(next);
+
+
+        return ItemMapper.toResponseDto(item, lastDto, nextDto);
+    }
+
+    private List<Booking> allApprovedBooking(List<Item> list) {
+        return bookingRepository.findAllByItemAndAndStatus(list, Status.APPROVED);
     }
 }

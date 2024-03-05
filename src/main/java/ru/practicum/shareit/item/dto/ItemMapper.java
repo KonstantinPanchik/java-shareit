@@ -11,38 +11,40 @@ import java.util.stream.Collectors;
 
 public class ItemMapper {
 
-
     public static ItemResponseDto toResponseDto(Item item) {
-
-        List<ItemResponseDto.CommentDto> commentDtos = item.getComments()
-                .stream()
-                .map(ItemMapper::toCommentDto)
-                .collect(Collectors.toList());
 
         return ItemResponseDto.builder()
                 .id(item.getId())
                 .name(item.getName())
-                .comments(commentDtos)
+                .requestId(getRequestId(item))
+                .comments(commentDtos(item))
                 .description(item.getDescription())
                 .available(item.getAvailable()).build();
+    }
+
+    private static List<ItemResponseDto.CommentDto> commentDtos(Item item) {
+        return item.getComments()
+                .stream()
+                .map(ItemMapper::toCommentDto)
+                .collect(Collectors.toList());
+    }
+
+    private static Long getRequestId(Item item) {
+        if (item.getRequest() != null) {
+            return item.getRequest().getId();
+        } else {
+            return null;
+        }
     }
 
     public static ItemResponseDto toResponseDto(Item item,
                                                 ItemResponseDto.BookingDto last,
                                                 ItemResponseDto.BookingDto next) {
-        List<ItemResponseDto.CommentDto> commentDtos = item.getComments()
-                .stream()
-                .map(ItemMapper::toCommentDto)
-                .collect(Collectors.toList());
 
-        return ItemResponseDto.builder().id(item.getId())
-                .name(item.getName())
-                .description(item.getDescription())
-                .available(item.getAvailable())
-                .lastBooking(last)
-                .nextBooking(next)
-                .comments(commentDtos)
-                .build();
+        ItemResponseDto itemResponseDto = toResponseDto(item);
+        itemResponseDto.setLastBooking(last);
+        itemResponseDto.setNextBooking(next);
+        return itemResponseDto;
     }
 
     public static Item updateNotNullFromDto(@NotNull ItemCreationDto itemCreationDto, @NotNull Item item) {
@@ -66,7 +68,8 @@ public class ItemMapper {
         ItemResponseDto.CommentDto dto = ItemResponseDto.CommentDto.builder()
                 .text(comment.getText())
                 .authorName(comment.getAuthor().getName())
-                .id(comment.getId()).created(comment.getCreated())
+                .id(comment.getId())
+                .created(comment.getCreated())
                 .build();
         return dto;
     }

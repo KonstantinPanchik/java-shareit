@@ -1,7 +1,8 @@
 package ru.practicum.shareit.item.model;
 
+import lombok.Builder;
 import lombok.Data;
-import ru.practicum.shareit.request.ItemRequest;
+import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
@@ -11,6 +12,7 @@ import java.util.List;
 
 
 @Data
+@Builder
 @Entity
 @Table(name = "items")
 public class Item {
@@ -27,7 +29,7 @@ public class Item {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     User user;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "request_id")
     ItemRequest request;
 
@@ -39,14 +41,13 @@ public class Item {
     public Item() {
     }
 
-    public Item(long id, String name, String description, boolean available, User user, ItemRequest request) {
+    public Item(Long id, String name, String description, Boolean available, User user, ItemRequest request, List<Comment> comments) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.available = available;
         this.user = user;
         this.request = request;
+        this.comments = comments;
     }
-
-
 }

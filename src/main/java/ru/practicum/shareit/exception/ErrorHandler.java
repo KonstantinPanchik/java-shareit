@@ -20,13 +20,6 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
-    public ResponseEntity handleEmailAlreadyExist(final EmailAlreadyExistException e) {
-        log.trace(e.getMessage());
-        ResponseEntity email = ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
-        return email;
-    }
-
-    @ExceptionHandler
     public ResponseEntity handleAccessIsDenied(final AccessIsDeniedException e) {
         log.trace(e.getMessage());
         ResponseEntity access = ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());

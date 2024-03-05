@@ -11,7 +11,6 @@ import ru.practicum.shareit.user.repository.UserRepository;
 
 import javax.transaction.Transactional;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +27,7 @@ public class UserServiceImp implements UserService {
 
     @Override
     public User updateUser(Long userId, UserDto userDto) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException());
+        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found"));
         UserMapper.updateFromDto(userDto, user);
         return userRepository.save(user);
     }
@@ -46,8 +45,8 @@ public class UserServiceImp implements UserService {
 
     @Override
     public User getUser(Long userId) {
-        Optional<User> optional = userRepository.findById(userId);
-        User user = optional.orElseThrow(() -> new NotFoundException("User not found"));
-        return user;
+
+        return userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found"));
+
     }
 }
