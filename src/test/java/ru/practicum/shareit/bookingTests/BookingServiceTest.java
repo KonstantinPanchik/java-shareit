@@ -198,8 +198,6 @@ public class BookingServiceTest {
 
         assertThrows(AccessIsDeniedException.class,
                 () -> bookingService.getBookingOfBooker(user3.getId(), savedbooking.getId()));
-
-
     }
 
     @Test
@@ -224,8 +222,6 @@ public class BookingServiceTest {
                 0, 10);
 
         assertEquals(bookingsOfBooker.size(), 2);
-
-
     }
 
     @Test
@@ -302,8 +298,6 @@ public class BookingServiceTest {
                 0, 10);
 
         assertEquals(bookingsOfBooker.size(), 1);
-
-
     }
 
     @Test
@@ -353,8 +347,6 @@ public class BookingServiceTest {
                 0, 10);
 
         assertEquals(rejectedBookingsOfBooker.size(), 1);
-
-
     }
 
     @Test
@@ -379,8 +371,6 @@ public class BookingServiceTest {
                 0, 10);
 
         assertEquals(bookingsOfBooker.size(), 2);
-
-
     }
 
     @Test
@@ -405,8 +395,6 @@ public class BookingServiceTest {
                 0, 10);
 
         assertEquals(bookingsOfBooker.size(), 2);
-
-
     }
 
     @Test
@@ -431,8 +419,6 @@ public class BookingServiceTest {
                 0, 10);
 
         assertEquals(bookingsOfBooker.size(), 2);
-
-
     }
 
     @Test
@@ -457,8 +443,6 @@ public class BookingServiceTest {
                 0, 10);
 
         assertEquals(bookingsOfBooker.size(), 1);
-
-
     }
 
     @Test
@@ -508,7 +492,5 @@ public class BookingServiceTest {
                 0, 10);
 
         assertEquals(rejectedBookingsOfBooker.size(), 1);
-
-
     }
 }

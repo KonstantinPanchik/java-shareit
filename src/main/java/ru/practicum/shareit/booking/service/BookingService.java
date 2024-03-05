@@ -12,7 +12,6 @@ public interface BookingService {
 
     Booking addBooking(Long bookerId, BookingCreationDto bcd);
 
-
     Booking setAppove(Long userId, Long bookingId, Boolean approved);
 
     Booking getBookingOfBooker(Long userId, Long bookingId);
@@ -20,4 +19,6 @@ public interface BookingService {
     List<Booking> getAllBookingOfBooker(Long bookerId, StateOfBookings state, Integer from, Integer size);
 
     List<Booking> getBookingOfOwner(Long ownerId, StateOfBookings state, Integer from, Integer size);
+
+
 }

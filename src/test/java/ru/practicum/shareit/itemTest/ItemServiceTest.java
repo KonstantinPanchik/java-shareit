@@ -112,10 +112,9 @@ public class ItemServiceTest {
         when(itemRepository.findById(anyLong()))
                 .thenReturn(Optional.of(testItem(testUser())));
 
-        when(bookingRepository.findLastByItem(anyLong(), any(), any()))
+        when(bookingRepository.findAllByItemAndAndStatus(any(), any()))
                 .thenReturn(new ArrayList<>());
-        when(bookingRepository.findNextByItem(anyLong(), any(), any()))
-                .thenReturn(new ArrayList<>());
+
 
         ItemResponseDto responseDto = service.updateItem(dto, 1L, 2L);
         assertEquals(responseDto.getName(), dto.getName());
@@ -131,9 +130,7 @@ public class ItemServiceTest {
         when(itemRepository.findById(anyLong()))
                 .thenReturn(Optional.of(testItem(testUser())));
 
-        when(bookingRepository.findLastByItem(anyLong(), any(), any()))
-                .thenReturn(new ArrayList<>());
-        when(bookingRepository.findNextByItem(anyLong(), any(), any()))
+        when(bookingRepository.findAllByItemAndAndStatus(any(), any()))
                 .thenReturn(new ArrayList<>());
 
         ItemResponseDto responseDto = service.updateItem(dto, 1L, 2L);
@@ -148,9 +145,7 @@ public class ItemServiceTest {
         when(itemRepository.findById(anyLong()))
                 .thenReturn(Optional.of(testItem(testUser())));
 
-        when(bookingRepository.findLastByItem(anyLong(), any(), any()))
-                .thenReturn(new ArrayList<>());
-        when(bookingRepository.findNextByItem(anyLong(), any(), any()))
+        when(bookingRepository.findAllByItemAndAndStatus(any(), any()))
                 .thenReturn(new ArrayList<>());
 
         ItemResponseDto responseDto = service.updateItem(dto, 1L, 2L);
@@ -165,9 +160,7 @@ public class ItemServiceTest {
         when(itemRepository.findById(anyLong()))
                 .thenReturn(Optional.of(testItem(testUser())));
 
-        when(bookingRepository.findLastByItem(anyLong(), any(), any()))
-                .thenReturn(new ArrayList<>());
-        when(bookingRepository.findNextByItem(anyLong(), any(), any()))
+        when(bookingRepository.findAllByItemAndAndStatus(any(), any()))
                 .thenReturn(new ArrayList<>());
 
         assertThrows(AccessIsDeniedException.class, () -> service.updateItem(dto, 2L, 2L));
@@ -180,16 +173,14 @@ public class ItemServiceTest {
         when(itemRepository.findById(anyLong()))
                 .thenReturn(Optional.of(testItem(testUser())));
 
-        when(bookingRepository.findLastByItem(anyLong(), any(), any()))
-                .thenReturn(List.of(testLastBooking(new User(31L, "user31", "user31@mail.ru"))));
-        when(bookingRepository.findNextByItem(anyLong(), any(), any()))
-                .thenReturn(List.of(testLastBooking(new User(41L, "user41", "user41@mail.ru"))));
+        when(bookingRepository.findAllByItemAndAndStatus(any(), any()))
+                .thenReturn(List.of(testLastBooking(new User(31L, "user31", "user31@mail.ru")),
+                        testNextBooking(new User(41L, "user41", "user41@mail.ru"))));
 
 
         ItemResponseDto responseDto = service.getItem(2L, 1L);
 
-        verify(bookingRepository, times(1)).findLastByItem(anyLong(), any(), any());
-        verify(bookingRepository, times(1)).findNextByItem(anyLong(), any(), any());
+        verify(bookingRepository, times(1)).findAllByItemAndAndStatus(any(), any());
 
         assertEquals(responseDto.getName(), testItem(testUser()).getName());
         assertNotNull(responseDto.getNextBooking());
@@ -202,16 +193,14 @@ public class ItemServiceTest {
         when(itemRepository.findById(anyLong()))
                 .thenReturn(Optional.of(testItem(testUser())));
 
-        when(bookingRepository.findLastByItem(anyLong(), any(), any()))
-                .thenReturn(List.of(testLastBooking(new User(31L, "user31", "user31@mail.ru"))));
-        when(bookingRepository.findNextByItem(anyLong(), any(), any()))
-                .thenReturn(List.of(testNextBooking(new User(41L, "user41", "user41@mail.ru"))));
+        when(bookingRepository.findAllByItemAndAndStatus(any(), any()))
+                .thenReturn(List.of(testLastBooking(new User(31L, "user31", "user31@mail.ru")),
+                        testNextBooking(new User(41L, "user41", "user41@mail.ru"))));
 
 
         ItemResponseDto responseDto = service.getItem(2L, 1341L);
 
-        verify(bookingRepository, times(0)).findLastByItem(anyLong(), any(), any());
-        verify(bookingRepository, times(0)).findNextByItem(anyLong(), any(), any());
+        verify(bookingRepository, times(0)).findAllByItemAndAndStatus(any(), any());
 
         assertEquals(responseDto.getName(), testItem(testUser()).getName());
         assertNull(responseDto.getNextBooking());
@@ -342,8 +331,9 @@ public class ItemServiceTest {
         return Booking.builder()
                 .id(4L)
                 .booker(user)
-                .start(LocalDateTime.now().minusDays(2))
-                .end(LocalDateTime.now().minusDays(1))
+                .item(testItem(testUser()))
+                .start(LocalDateTime.now().plusDays(1))
+                .end(LocalDateTime.now().plusDays(2))
                 .build();
 
     }
@@ -352,6 +342,7 @@ public class ItemServiceTest {
         return Booking.builder()
                 .id(3L)
                 .booker(user)
+                .item(testItem(testUser()))
                 .start(LocalDateTime.now().minusDays(2))
                 .end(LocalDateTime.now().minusDays(1))
                 .build();

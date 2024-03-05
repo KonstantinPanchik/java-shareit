@@ -66,7 +66,7 @@ public class ItemServiceImp implements ItemService {
         item = ItemMapper.updateNotNullFromDto(itemCreationDto, item);
         itemRepository.save(item);
 
-        return setBookings(item);
+        return setBookings(item, allApprovedBooking(List.of(item)));
     }
 
     @Override
@@ -75,7 +75,9 @@ public class ItemServiceImp implements ItemService {
 
         if (item.getUser().getId().equals(userId)) {
 
-            return setBookings(item);
+            List<Booking> bookings = allApprovedBooking(List.of(item));
+
+            return setBookings(item, bookings);
         } else {
 
             return ItemMapper.toResponseDto(item);
@@ -85,10 +87,11 @@ public class ItemServiceImp implements ItemService {
     @Override
     public List<ItemResponseDto> getUserItems(Long userId, Integer from, Integer size) {
 
-        return itemRepository.userItems(userId, PageRequest.of(from / size, size, Sort.by("id")))
-                .stream()
-                .map(item -> setBookings(item))
-                .collect(Collectors.toList());
+        List<Item> items = itemRepository.userItems(userId, PageRequest.of(from / size, size, Sort.by("id")));
+
+        List<Booking> bookings = allApprovedBooking(items);
+
+        return items.stream().map(item -> setBookings(item, bookings)).collect(Collectors.toList());
     }
 
     @Override
@@ -117,19 +120,42 @@ public class ItemServiceImp implements ItemService {
 
     }
 
-    private ItemResponseDto setBookings(Item item) {
+    private ItemResponseDto setBookings(Item item, List<Booking> allApproved) {
 
-        Booking last = bookingRepository
-                .findLastByItem(item.getId(), LocalDateTime.now(), Status.APPROVED).stream().findFirst().orElse(null);
+
+        Booking last = allApproved
+                .stream()
+                .filter(booking -> booking.getItem().getId().equals(item.getId()))
+                .filter(booking -> booking.getStart().isBefore(LocalDateTime.now()))
+                .sorted((o1, o2) -> {
+                    if (o1.getStart().isBefore(o2.getStart())) {
+                        return 1;
+                    } else {
+                        return -1;
+                    }
+                })
+                .findFirst().orElse(null);
         ItemResponseDto.BookingDto lastDto = BookingMapper.toItemBookingDto(last);
 
-        Booking next = bookingRepository
-                .findNextByItem(item.getId(), LocalDateTime.now(), Status.APPROVED).stream().findFirst().orElse(null);
+        Booking next = allApproved
+                .stream()
+                .filter(booking -> booking.getItem().getId().equals(item.getId()))
+                .filter(booking -> booking.getStart().isAfter(LocalDateTime.now()))
+                .sorted((o1, o2) -> {
+                    if (o1.getStart().isBefore(o2.getStart())) {
+                        return -1;
+                    } else {
+                        return 1;
+                    }
+                })
+                .findFirst().orElse(null);
         ItemResponseDto.BookingDto nextDto = BookingMapper.toItemBookingDto(next);
 
 
         return ItemMapper.toResponseDto(item, lastDto, nextDto);
+    }
 
-
+    private List<Booking> allApprovedBooking(List<Item> list) {
+        return bookingRepository.findAllByItemAndAndStatus(list, Status.APPROVED);
     }
 }

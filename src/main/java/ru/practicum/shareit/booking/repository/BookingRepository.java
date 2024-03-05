@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.Status;
+import ru.practicum.shareit.item.model.Item;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,16 +23,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     @EntityGraph("Bookings.bookerAndItem")
     Optional<Booking> findById(Long aLong);
 
-
-    @Query("select b from Booking as b join fetch b.booker as u " +
-            "join fetch b.item as i " +
-            "WHERE i.id=?1 AND b.start>?2 AND b.status=?3 ORDER BY b.start ")
-    List<Booking> findNextByItem(Long aLong, LocalDateTime now, Status status);
-
-    @Query("select b from Booking as b join fetch b.booker as u " +
-            "join fetch b.item as i " +
-            "WHERE i.id=?1 AND b.start<?2 AND b.status=?3 ORDER BY b.start DESC ")
-    List<Booking> findLastByItem(Long aLong, LocalDateTime now, Status status);
+    @Query("select b from Booking as b WHERE b.status=?2 and b.item in ?1")
+    List<Booking> findAllByItemAndAndStatus(List<Item> items, Status status);
 
     //методы получения бронирований от букера
     @Query("select b from Booking as b join fetch b.booker as u " +
