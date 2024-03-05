@@ -17,7 +17,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
-
 public class ItemRequestRepositoryTest {
 
     private final ItemRequestRepository repository;
@@ -31,11 +30,10 @@ public class ItemRequestRepositoryTest {
 
     @Test
     public void add() {
-        User vitya = new User(null, "вВитёк", "vitek@gmail.com");
+        User vitya = new User(null, "Витёк", "vitek@gmail.com");
         assertNull(vitya.getId());
         userRepository.save(vitya);
         assertNotNull(vitya.getId());
-
 
         ItemRequest itemRequest = ItemRequest.builder()
                 .description("Неважно что это за предмет!!!!")
@@ -43,13 +41,17 @@ public class ItemRequestRepositoryTest {
                 .created(LocalDateTime.now())
                 .build();
         assertNull(itemRequest.getId());
-        repository.save(itemRequest);
-        assertNotNull(itemRequest.getId());
+        ItemRequest savedItemRequest = repository.save(itemRequest);
+        assertNotNull(savedItemRequest.getId());
+        assertEquals(savedItemRequest.getDescription(), "Неважно что это за предмет!!!!");
+        assertEquals(savedItemRequest.getRequestor(), vitya);
+        assertEquals(savedItemRequest.getCreated(), itemRequest.getCreated());
+
     }
 
     @Test
-    public void getAllRequests() {
-        User vitya = new User(null, "вВитёк", "vitek@gmail.com");
+    public void shouldGetAllRequestsInRightOrder() {
+        User vitya = new User(null, "Витёк", "vitek@gmail.com");
         assertNull(vitya.getId());
         userRepository.save(vitya);
         assertNotNull(vitya.getId());
@@ -65,7 +67,7 @@ public class ItemRequestRepositoryTest {
         assertEquals(3, fromDb.size());
         assertEquals(requests.get(0), fromDb.get(2));
         assertEquals(requests.get(1), fromDb.get(1));
-
+        assertEquals(requests.get(2), fromDb.get(0));
     }
 
     @Test
@@ -80,7 +82,6 @@ public class ItemRequestRepositoryTest {
         assertNull(petr.getId());
         userRepository.save(petr);
         assertNotNull(petr.getId());
-
 
         List<ItemRequest> requests = getTestRequests(3, vitya);
 
@@ -112,7 +113,5 @@ public class ItemRequestRepositoryTest {
             result.add(request);
         }
         return result;
-
     }
-
 }
