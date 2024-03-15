@@ -82,7 +82,7 @@ public class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().string("User with id 1 has been deleted"));
+                .andExpect(jsonPath("$.message", is("User with id 1 has been deleted")));
 
     }
 

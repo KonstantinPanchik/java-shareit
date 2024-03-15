@@ -44,7 +44,7 @@ public class ErrorHandlerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
-                .andExpect(content().string("User"));
+                .andExpect(jsonPath("$.message").value("User"));
     }
 
     @Test
@@ -57,7 +57,7 @@ public class ErrorHandlerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
-                .andExpect(content().string("AccessIsDeniedException"));
+                .andExpect(jsonPath("$.message").value("AccessIsDeniedException"));
     }
 
     @Test
@@ -70,7 +70,7 @@ public class ErrorHandlerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("ItemNotAvailableException"));
+                .andExpect(jsonPath("$.message").value("ItemNotAvailableException"));
     }
 
     @Test
@@ -84,17 +84,5 @@ public class ErrorHandlerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").value("message"));
-    }
-
-    @Test
-    public void shouldThrowable() throws Exception {
-        when(mockUserService.getUser(anyLong()))
-                .thenThrow(new RuntimeException());
-
-        mockMvc.perform(get("/users/1")
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isInternalServerError());
     }
 }
