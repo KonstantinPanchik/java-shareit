@@ -108,10 +108,10 @@ public class ItemServiceImp implements ItemService {
 
     @Override
     public ItemResponseDto.CommentDto addComment(CommentCreationDto commentCreationDto, Long userId, Long itemId) {
-log.debug("Дошли до  айтем сервиса ");
+
         Comment comment = new Comment();
         comment.setText(commentCreationDto.getText());
-        log.debug("Дошли до  айтем сервиса текс коммента"+comment.getText());
+
         User user = userService.getUser(userId);
         List<Booking> bookings = bookingRepository.findByItemAndBooker(itemId, userId, LocalDateTime.now());
         if (bookings.isEmpty()) {
