@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 @RequestMapping(path = "/bookings")
 @RequiredArgsConstructor
 @Slf4j
-
 public class BookingController {
 
     private final BookingService bookingService;
@@ -26,6 +25,9 @@ public class BookingController {
                                                    @RequestBody BookItemRequestDto bookItemRequestDto) {
 
         Booking booking = bookingService.addBooking(userId, bookItemRequestDto);
+
+        log.debug("Creating gateway booking {}, userId={}", booking, userId);
+
         return ResponseEntity.ok(BookingMapper.toBookingResponse(booking));
     }
 
@@ -34,6 +36,9 @@ public class BookingController {
                                              @PathVariable Long bookingId,
                                              @RequestParam Boolean approved) {
         Booking booking = bookingService.setAppove(userId, bookingId, approved);
+
+        log.debug("Patch gateway booking by  userId={}, booking={}, approved={}", userId, bookingId, approved);
+
         return ResponseEntity.ok(BookingMapper.toBookingResponse(booking));
     }
 
@@ -41,6 +46,9 @@ public class BookingController {
     public ResponseEntity<Object> getBooking(@RequestHeader("X-Sharer-User-Id") Long userId,
                                              @PathVariable Long bookingId) {
         Booking booking = bookingService.getBookingOfBooker(userId, bookingId);
+
+        log.debug("Get gateway booking {}, userId={}", bookingId, userId);
+
         return ResponseEntity.ok(BookingMapper.toBookingResponse(booking));
     }
 
@@ -51,6 +59,8 @@ public class BookingController {
                                                   @RequestParam(required = false, defaultValue = "10") Integer size) {
         BookingState bookingState = BookingState.from(state)
                 .orElseThrow(() -> new UnknownStateException("Unknown state: " + state));
+
+        log.debug("Get bookings with state {}, userId={}, from={}, size={}", state, userId, from, size);
 
         return ResponseEntity.ok(bookingService.getAllBookingOfBooker(userId, bookingState, from, size)
                 .stream()
@@ -65,6 +75,8 @@ public class BookingController {
                                                       @RequestParam(required = false, defaultValue = "10") Integer size) {
 
         BookingState bookingState = BookingState.valueOf(state);
+
+        log.debug("Get bookings owner with state {}, userId={}, from={}, size={}", state, userId, from, size);
 
         return ResponseEntity.ok(bookingService.getBookingOfOwner(userId, bookingState, from, size)
                 .stream()

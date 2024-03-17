@@ -58,7 +58,7 @@ public class ItemController {
     public ResponseEntity<Object> search(@RequestParam String text,
                                          @RequestParam(required = false, defaultValue = "0") @Min(0) Integer from,
                                          @RequestParam(required = false, defaultValue = "20") @Min(1) Integer size) {
-        log.debug("GET gateway search {}", text);
+        log.info("GET gateway search {}", text);
         return client.search(text.toLowerCase(), from, size);
     }
 
@@ -66,7 +66,7 @@ public class ItemController {
     public ResponseEntity<Object> addComment(@RequestBody @Valid CommentCreationDto comment,
                                              @RequestHeader("X-Sharer-User-Id") @NotNull Long userId,
                                              @PathVariable Long itemId) {
-        log.debug("Post gateway add comment: {} user {}", comment.getText(), userId);
+        log.info("Post gateway add comment: {} user {}", comment.getText(), userId);
         return client.addComment(comment, userId, itemId);
 
     }
